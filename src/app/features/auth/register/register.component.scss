@@ -1,0 +1,167 @@
+// Importamos variables si fuera necesario, pero como están en :root global, no hace falta @use
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--color-bg-primary);
+  padding: var(--spacing-md);
+}
+
+.auth-card {
+  background-color: var(--color-bg-surface);
+  padding: 2.5rem;
+  border-radius: var(--border-radius-md);
+  width: 100%;
+  max-width: 500px; // Un poco más ancho que el login para acomodar los nombres
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  animation: fadeIn 0.6s ease-out;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  .auth-title {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+  }
+
+  .auth-subtitle {
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+}
+
+// Grid para Nombre/Apellido
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr; // En móviles se apilan
+  }
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.form-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-text-secondary);
+  padding: 0.8rem 0;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+
+  &:focus {
+    border-color: var(--color-primary);
+  }
+
+  &:focus + .form-label,
+  &:not(:placeholder-shown) + .form-label {
+    top: -10px;
+    font-size: 0.8rem;
+    color: var(--color-primary);
+  }
+}
+
+.form-label {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  color: var(--color-text-secondary);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.error-text {
+  color: var(--color-danger);
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: block;
+}
+
+.helper-text {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  margin-top: 4px;
+  opacity: 0.7;
+}
+
+.alert-error {
+  background-color: rgba(207, 102, 121, 0.1); // Rojo suave transparente
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.9rem;
+  background-color: var(--color-primary);
+  color: var(--color-text-on-primary); // Usando la nueva variable
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px var(--color-primary-glow);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-primary-light);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: bold;
+  &:hover { text-decoration: underline; }
+}
+
+.auth-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

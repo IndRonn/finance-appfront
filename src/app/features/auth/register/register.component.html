@@ -1,1 +1,59 @@
-<p>register works!</p>
+<div class="auth-container">
+  <div class="auth-card">
+
+    <header class="auth-header">
+      <h1 class="auth-title">Nueva Cuenta</h1>
+      <p class="auth-subtitle">Comienza tu legado financiero</p>
+    </header>
+
+    <div *ngIf="errorMessage()" class="alert-error">
+      {{ errorMessage() }}
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+
+      <div class="form-row">
+        <div class="form-group">
+          <input type="text" id="firstName" class="form-input" formControlName="firstName" placeholder=" ">
+          <label for="firstName" class="form-label">Nombre *</label>
+          <span class="error-text" *ngIf="registerForm.get('firstName')?.touched && registerForm.get('firstName')?.hasError('required')">
+            Requerido
+          </span>
+        </div>
+
+        <div class="form-group">
+          <input type="text" id="lastName" class="form-input" formControlName="lastName" placeholder=" ">
+          <label for="lastName" class="form-label">Apellido</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <input type="email" id="email" class="form-input" formControlName="email" placeholder=" " autocomplete="email">
+        <label for="email" class="form-label">Correo Electrónico *</label>
+        <span class="error-text" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+          Formato inválido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <input type="password" id="password" class="form-input" formControlName="password" placeholder=" " autocomplete="new-password">
+        <label for="password" class="form-label">Contraseña *</label>
+        <span class="helper-text" *ngIf="!registerForm.get('password')?.touched">Mínimo 8 caracteres</span>
+        <span class="error-text" *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
+          Mínimo 8 caracteres
+        </span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="registerForm.invalid || isLoading()">
+          <span *ngIf="!isLoading()">Crear Cuenta</span>
+          <span *ngIf="isLoading()" class="spinner"></span>
+        </button>
+      </div>
+
+      <div class="auth-footer">
+        <p>¿Ya tienes cuenta? <a routerLink="/auth/login" class="link">Inicia Sesión</a></p>
+      </div>
+    </form>
+  </div>
+</div>
