@@ -1,0 +1,153 @@
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--color-bg-primary);
+  padding: var(--spacing-md);
+}
+
+.auth-card {
+  background-color: var(--color-bg-surface);
+  padding: 2.5rem;
+  border-radius: var(--border-radius-md);
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  // Animación de entrada suave
+  animation: fadeIn 0.8s ease-out;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  .auth-title {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+  }
+
+  .auth-subtitle {
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+}
+
+// --- Floating Inputs ---
+.form-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.form-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-text-secondary);
+  padding: 0.8rem 0;
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+
+  &:focus {
+    border-color: var(--color-primary);
+  }
+
+  // Magia del Label Flotante
+  &:focus + .form-label,
+  &:not(:placeholder-shown) + .form-label {
+    top: -10px;
+    font-size: 0.8rem;
+    color: var(--color-primary);
+  }
+}
+
+.form-label {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  color: var(--color-text-secondary);
+  transition: all 0.3s ease;
+  pointer-events: none; // Permite hacer click a través del label
+}
+
+.error-text {
+  color: var(--color-danger);
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: block;
+}
+
+// --- Buttons ---
+.btn-primary {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.1s;
+  box-shadow: 0 0 10px var(--color-primary-glow);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-primary-light);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+.link {
+  color: var(--color-primary);
+  text-decoration: none;
+  &:hover { text-decoration: underline; }
+}
+
+.auth-footer {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+// --- Animations ---
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.shake-animation {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  border-color: var(--color-danger); // Borde rojo temporal
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+// Spinner simple
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

@@ -1,47 +1,43 @@
-/* You can add global styles to this file, and also import other style files */
 /* =========================================
-   DESIGN SYSTEM TOKENS
+   DESIGN SYSTEM TOKENS - SLYTHERIN 2.0 (High Contrast)
    ========================================= */
 :root {
-  // 🌑 Backgrounds
-  --color-bg-primary: #121212;
-  --color-bg-surface: #1E1E1E;
-  --color-bg-elevated: #2C2C2C;
+  // 🌑 Backgrounds (Mantenemos la profundidad)
+  --color-bg-primary: #0a0a0a;   // Negro casi puro (Más profundo que antes)
+  --color-bg-surface: #1C1C1E;   // Gris Oscuro iOS style
+  --color-bg-elevated: #2C2C2E;  // Modales
 
-  // 🐍 Brand Colors (Identity)
-  --color-primary: #1A472A;
-  --color-primary-light: #2E5C3E;
-  --color-primary-glow: rgba(26, 71, 42, 0.6);
+  // 🐍 Brand Colors (REMASTERIZADOS)
+  // Antes: #1A472A (Muy oscuro) -> Ahora: #2E8B57 (Legible y elegante)
+  --color-primary: #2E8B57;
+  --color-primary-light: #3CB371; // Para Hovers
+  --color-primary-dark: #1A4D2E;  // Para degradados sutiles
+
+  --color-primary-glow: rgba(46, 139, 87, 0.5); // Glow ajustado al nuevo verde
 
   // 🪙 Typography & Icons
-  --color-text-primary: #E0E0E0;
-  --color-text-secondary: #A0A0A0;
-  --color-text-muted: #666666;
+  --color-text-primary: #F5F5F7; // Blanco Hueso (Más brillante que el plata anterior)
+  --color-text-secondary: #A1A1A6; // Gris Platino
+  --color-text-on-primary: #FFFFFF; // Texto sobre botones verdes
 
   // 🚦 Semantic Colors
-  --color-money-in: #2E8B57;
-  --color-money-out: #8B0000;
-  --color-warning: #D4AF37;
-  --color-danger: #CF6679;
+  --color-money-in: #34C759;     // Verde iOS (Más vibrante para números positivos)
+  --color-money-out: #FF3B30;    // Rojo Alerta
+  --color-warning: #FFD60A;      // Dorado Intenso
+  --color-danger: #FF453A;
 
-  // 📐 Spacing
+  // 📐 Spacing & Radius
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
 
-  --border-radius-md: 8px;
+  --border-radius-md: 12px; // Un poco más suave
 }
 
 /* =========================================
-   RESET & BASE
+   RESET & BASE (Ajustes menores)
    ========================================= */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
@@ -49,7 +45,8 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3 {
-  font-family: 'Cinzel', serif;
-  color: var(--color-text-primary);
+// Actualizamos el color de selección de texto para que combine
+::selection {
+  background-color: var(--color-primary);
+  color: white;
 }

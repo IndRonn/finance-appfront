@@ -1,0 +1,55 @@
+<div class="auth-container">
+  <div class="auth-card" [class.shake-animation]="hasError()">
+
+    <header class="auth-header">
+      <h1 class="auth-title">Finance App</h1>
+      <p class="auth-subtitle">Control. Silencio. Poder.</p>
+    </header>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+
+      <div class="form-group">
+        <input
+          type="email"
+          id="email"
+          class="form-input"
+          formControlName="email"
+          placeholder=" "
+          autocomplete="email">
+        <label for="email" class="form-label">Correo Electrónico</label>
+
+        <span class="error-text"
+              *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
+          Ingresa un correo válido
+        </span>
+      </div>
+
+      <div class="form-group">
+        <input
+          type="password"
+          id="password"
+          class="form-input"
+          formControlName="password"
+          placeholder=" "
+          autocomplete="current-password">
+        <label for="password" class="form-label">Contraseña</label>
+
+        <span class="error-text"
+              *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid">
+          Mínimo 6 caracteres
+        </span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="loginForm.invalid || isLoading()">
+          <span *ngIf="!isLoading()">Ingresar</span>
+          <span *ngIf="isLoading()" class="spinner"></span>
+        </button>
+      </div>
+
+      <div class="auth-footer">
+        <p>¿No tienes cuenta? <a routerLink="/auth/register" class="link">Regístrate</a></p>
+      </div>
+    </form>
+  </div>
+</div>
