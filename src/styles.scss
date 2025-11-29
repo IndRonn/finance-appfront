@@ -1,1 +1,55 @@
 /* You can add global styles to this file, and also import other style files */
+/* =========================================
+   DESIGN SYSTEM TOKENS
+   ========================================= */
+:root {
+  // 🌑 Backgrounds
+  --color-bg-primary: #121212;
+  --color-bg-surface: #1E1E1E;
+  --color-bg-elevated: #2C2C2C;
+
+  // 🐍 Brand Colors (Identity)
+  --color-primary: #1A472A;
+  --color-primary-light: #2E5C3E;
+  --color-primary-glow: rgba(26, 71, 42, 0.6);
+
+  // 🪙 Typography & Icons
+  --color-text-primary: #E0E0E0;
+  --color-text-secondary: #A0A0A0;
+  --color-text-muted: #666666;
+
+  // 🚦 Semantic Colors
+  --color-money-in: #2E8B57;
+  --color-money-out: #8B0000;
+  --color-warning: #D4AF37;
+  --color-danger: #CF6679;
+
+  // 📐 Spacing
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  --border-radius-md: 8px;
+}
+
+/* =========================================
+   RESET & BASE
+   ========================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: 'Lato', sans-serif;
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  font-family: 'Cinzel', serif;
+  color: var(--color-text-primary);
+}
