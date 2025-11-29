@@ -1,0 +1,67 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6); // Fondo oscuro semi-transparente
+  backdrop-filter: blur(4px); // Efecto vidrio borroso
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-container {
+  background-color: var(--color-bg-card); // Blanco o Gris según tema
+  width: 90%;
+  max-width: 500px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--color-text-heading);
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-sidebar-text);
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: rgba(0,0,0,0.05);
+      color: var(--color-danger);
+    }
+  }
+}
+
+.modal-content {
+  padding: 1.5rem;
+  max-height: 80vh; // Evita que se salga de pantalla en móviles
+  overflow-y: auto;
+}
+
+// Animaciones
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

@@ -1,0 +1,132 @@
+.header-container {
+  height: var(--header-height); // 80px
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.5rem; // Padding interno ligero, el page-container da el resto
+  background-color: transparent; // Se funde con el fondo gris claro
+  margin-bottom: 0.2rem; // Separa el header del contenido del dashboard
+}
+
+// --- IZQUIERDA: TÍTULOS ---
+.header-title-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .overline {
+    // Usa la clase global que definimos, pero aseguramos estilos aquí
+    font-size: 0.7rem;
+    color: var(--color-sidebar-text); // Gris medio
+    letter-spacing: 2px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: 'Lato', sans-serif;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--color-text-heading); // Negro tinta
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+  }
+}
+
+// --- DERECHA: ACCIONES ---
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.icon-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; // Círculo perfecto
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-body);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--color-text-heading);
+  }
+
+  .material-symbols-rounded {
+    font-size: 1.5rem;
+  }
+
+  .badge-dot {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-danger);
+    border-radius: 50%;
+    border: 1px solid var(--color-bg-main);
+  }
+}
+
+.divider {
+  width: 1px;
+  height: 32px;
+  background-color: var(--color-border); // #E5E7EB
+}
+
+// --- PERFIL USUARIO ---
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+
+  .user-info {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+
+    .name {
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      color: var(--color-text-heading);
+      font-size: 0.9rem;
+    }
+
+    .role {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.75rem;
+      color: var(--color-sidebar-text);
+    }
+  }
+
+  .avatar {
+    width: 42px;
+    height: 42px;
+    background-color: var(--color-sidebar-bg); // Fondo oscuro (Sidebar color)
+    color: #fff;
+    border-radius: 10px; // Cuadrado redondeado (Squircle)
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: var(--shadow-subtle);
+  }
+}

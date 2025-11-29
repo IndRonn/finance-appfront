@@ -4,18 +4,26 @@ export interface Account {
   id: number;
   name: string;
   type: AccountType;
-  bankName?: string; // Opcional según schema
-  initialBalance: number;
-  isActive: boolean;
   currency: Currency;
+  bankName?: string;
+  initialBalance: number; // Nota: En TC, esto es la DEUDA ACTUAL (Positivo)
+  isActive: boolean;
+
+  // Nuevos campos oficiales del Backend
+  creditLimit?: number;   // Viene null en Débito/Efectivo
+  closingDate?: number;
+  paymentDate?: number;
 }
 
 export interface CreateAccountRequest {
   name: string;
   type: AccountType;
+  currency: Currency;
   bankName?: string;
   initialBalance: number;
-  currency: Currency;
-  closingDate?: number; // Para tarjetas de crédito (HU-13)
+
+  // Obligatorio para TC
+  creditLimit?: number;
+  closingDate?: number;
   paymentDate?: number;
 }

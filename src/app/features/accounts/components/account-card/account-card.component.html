@@ -1,0 +1,35 @@
+<div class="credit-card" [style.background]="getCardBackground()">
+
+  <div class="card-top">
+    <span class="bank-name">
+      {{ account.type === AccountType.EFECTIVO ? 'BILLETERA' : (account.bankName || 'BANCO') }}
+    </span>
+    <span class="card-type">{{ account.type }}</span>
+  </div>
+
+  <div class="card-chip" *ngIf="account.type !== AccountType.EFECTIVO">
+    <div class="chip-line"></div>
+    <div class="chip-line"></div>
+    <div class="chip-line"></div>
+  </div>
+
+  <div class="icon-cash" *ngIf="account.type === AccountType.EFECTIVO">
+    <span class="material-symbols-rounded">payments</span>
+  </div>
+
+  <div class="card-balance">
+    <span class="currency-symbol">{{ account.currency === 'PEN' ? 'S/' : '$' }}</span>
+    <span class="amount">{{ account.initialBalance | number:'1.2-2' }}</span>
+  </div>
+
+  <div class="card-bottom">
+    <div class="holder-info">
+      <span class="label">{{ account.type === AccountType.EFECTIVO ? 'PROPIETARIO' : 'TITULAR' }}</span>
+      <span class="value">{{ account.name | uppercase }}</span>
+    </div>
+    <div class="currency-badge">
+      {{ account.currency }}
+    </div>
+  </div>
+
+</div>

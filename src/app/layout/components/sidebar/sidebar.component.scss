@@ -1,0 +1,110 @@
+.sidebar-container {
+  width: 100%; // Ocupa el ancho que le dé el layout (260px)
+  height: 100%;
+  background-color: var(--color-sidebar-bg); // #0F1112
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.03); // Borde casi invisible
+}
+
+// --- 1. BRAND ---
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 3.5rem; // Espacio generoso antes del menú
+  padding-left: 0.5rem;
+
+  .brand-logo {
+    width: 36px;
+    height: 36px;
+    background-color: var(--color-primary); // Verde Esmeralda
+    color: #fff;
+    border-radius: 8px; // Cuadrado redondeado moderno
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 12px rgba(44, 95, 83, 0.4); // Glow verde sutil
+  }
+
+  .brand-name {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #fff;
+    letter-spacing: 0.1em; // Tracking elegante
+  }
+}
+
+// --- 2. MENU ---
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; // Espacio entre items
+  flex: 1; // Empuja el footer hacia abajo
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  border-radius: var(--border-radius-sm); // 6px
+  color: var(--color-sidebar-text); // Gris medio (#9CA3AF)
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Lato', sans-serif;
+  font-weight: 500;
+
+  .icon {
+    font-size: 1.4rem;
+    margin-right: 1rem;
+    transition: color 0.2s;
+  }
+
+  .label {
+    font-size: 0.95rem;
+  }
+
+  // Hover State (Interacción sutil)
+  &:hover {
+    background-color: var(--color-sidebar-hover); // Gris muy oscuro (#1A1D1F)
+    color: #fff;
+  }
+
+  // Active State (Ubicación actual)
+  &.active {
+    background-color: var(--color-sidebar-hover);
+    color: var(--color-sidebar-active); // Blanco puro
+
+    .icon {
+      color: #fff;
+      font-variation-settings: 'FILL' 1; // Rellena el icono (Material Symbols)
+    }
+  }
+}
+
+// --- 3. FOOTER / LOGOUT ---
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-item.logout {
+  color: var(--color-sidebar-text);
+
+  &:hover {
+    background-color: rgba(211, 47, 47, 0.1); // Fondo rojo muy suave
+    color: var(--color-danger); // Texto rojo
+
+    .icon { color: var(--color-danger); }
+  }
+}

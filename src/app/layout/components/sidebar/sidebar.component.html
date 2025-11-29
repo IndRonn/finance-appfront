@@ -1,0 +1,44 @@
+<aside class="sidebar-container">
+
+  <div class="brand">
+    <div class="brand-logo">F</div>
+    <span class="brand-name">FINANZAS</span>
+  </div>
+
+  <nav class="nav-menu">
+
+    <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-rounded icon">grid_view</span>
+      <span class="label">Dashboard</span>
+    </a>
+
+    <a routerLink="/transactions" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-rounded icon">sync_alt</span>
+      <span class="label">Movimientos</span>
+    </a>
+
+    <a routerLink="/budget" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-rounded icon">donut_large</span>
+      <span class="label">Presupuestos</span>
+    </a>
+
+    <a routerLink="/accounts" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-rounded icon">account_balance_wallet</span>
+      <span class="label">Cuentas</span>
+    </a>
+
+    <a routerLink="/debts" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-rounded icon">handshake</span>
+      <span class="label">Deudas</span>
+    </a>
+
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="nav-item logout" (click)="logout()">
+      <span class="material-symbols-rounded icon">logout</span>
+      <span class="label">Cerrar Sesión</span>
+    </button>
+  </div>
+
+</aside>

@@ -1,0 +1,144 @@
+// 1. HEADER "INLINE" (MÁXIMO AHORRO DE ESPACIO)
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.2rem;   // Mínimo aire arriba
+  margin-bottom: 0.5rem; // Separación con el contenido
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+
+  .title-group {
+    display: flex;
+    align-items: baseline; // Alinea la base de las letras (Elegancia Pura)
+    gap: 1rem; // Espacio entre "Billetera" y el subtítulo
+
+    h1 {
+      font-size: 1.4rem;
+      margin: 0;
+      font-weight: 700;
+      color: var(--color-text-heading);
+      line-height: 1;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--color-sidebar-text);
+      margin: 0;
+      font-weight: 400;
+
+      // Truco visual: Línea separadora antes del subtítulo
+      &::before {
+        content: '|';
+        margin-right: 10px;
+        opacity: 0.3;
+        font-weight: 300;
+      }
+
+      // En móviles, ocultamos el subtítulo para ahorrar espacio
+      @media (max-width: 600px) {
+        display: none;
+      }
+    }
+  }
+
+  // Botón Compacto
+  .btn-primary {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    height: 36px;
+    gap: 0.4rem;
+
+    .material-symbols-rounded { font-size: 1.1rem; }
+  }
+}
+
+// 2. SECCIONES (Ajustadas para subir el contenido)
+.account-section {
+  margin-bottom: 2.5rem; // Separación balanceada
+  animation: fadeIn 0.5s ease-out;
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+
+    .section-title {
+      font-size: 0.9rem;
+      color: var(--color-text-heading);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+
+      .icon { font-size: 1.2rem; color: var(--color-primary); }
+    }
+
+    .divider-line {
+      width: 100%;
+      height: 1px;
+      background-color: var(--color-border);
+      opacity: 0.5;
+    }
+  }
+}
+
+// 3. GRID RESPONSIVO
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+
+  &.credit-grid {
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 2rem; // Un poco más de aire para las tarjetas grandes
+  }
+}
+
+// --- ESTADOS DE CARGA Y VACÍO ---
+.loading-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem;
+  color: var(--color-sidebar-text);
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s infinite linear;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.empty-msg {
+  grid-column: 1 / -1;
+  padding: 2rem;
+  background-color: rgba(0,0,0,0.02);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--border-radius-lg);
+  text-align: center;
+  color: var(--color-sidebar-text);
+  font-size: 0.85rem;
+}
+
+// --- ESTILOS DEL MODAL (MANTENIDOS) ---
+.modal-form { display: flex; flex-direction: column; gap: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.3rem; label { font-weight: 600; font-size: 0.8rem; color: var(--color-text-heading); } }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-input, .form-select { padding: 0.7rem; border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); font-family: 'Lato', sans-serif; font-size: 0.9rem; &:focus { border-color: var(--color-primary); outline: none; } }
+.input-group { position: relative; display: flex; align-items: center; .prefix { position: absolute; left: 10px; font-weight: 600; opacity: 0.5; } input { padding-left: 2rem; width: 100%; } }
+.credit-section { background: rgba(0,0,0,0.02); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; border: 1px solid var(--color-border); .helper-text { font-size: 0.75rem; font-style: italic; opacity: 0.7; margin-top: 4px; } }
+.form-actions { display: flex; justify-content: flex-end; gap: 0.8rem; margin-top: 0.5rem; }
+.btn-cancel { background: transparent; border: 1px solid var(--color-border); padding: 0.6rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; color: var(--color-text-body); &:hover { background-color: rgba(0,0,0,0.05); } }
+.error-text { color: var(--color-danger); font-size: 0.7rem; margin-top: 2px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

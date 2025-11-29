@@ -1,0 +1,50 @@
+.footer-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0; // Padding vertical, el horizontal lo da el layout padre
+  margin-top: auto;  // Empuja el footer al final si hay poco contenido
+  border-top: 1px solid var(--color-border);
+  font-size: 0.8rem;
+  color: var(--color-sidebar-text); // Gris medio
+  font-family: 'Lato', sans-serif;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .version {
+    font-weight: 700;
+    color: var(--color-primary); // Toque de marca sutil
+    opacity: 0.8;
+  }
+
+  .divider { opacity: 0.3; }
+}
+
+.footer-right {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-link {
+  color: var(--color-sidebar-text);
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--color-text-heading);
+    text-decoration: underline;
+  }
+}
+
+// Responsividad Móvil
+@media (max-width: 600px) {
+  .footer-container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+}

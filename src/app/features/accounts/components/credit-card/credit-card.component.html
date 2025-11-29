@@ -1,0 +1,69 @@
+<div class="credit-card-container" [style.background]="getBackground()">
+
+  <div class="card-header">
+    <div class="bank-info">
+      <span class="bank-name">{{ account.bankName || 'BANCO' }}</span>
+      <span class="card-tier">TITANIUM</span>
+    </div>
+    <span class="card-type-badge">CRÉDITO</span>
+  </div>
+
+  <div class="card-body">
+    <div class="balance-wrapper">
+      <span class="label">DISPONIBLE</span>
+      <div class="amount">
+        <span class="currency">{{ account.currency === 'PEN' ? 'S/' : '$' }}</span>
+        <span class="value">{{ availableAmount | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <div class="chip-sim">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <div class="limit-section">
+    <div class="limit-info">
+      <div class="info-group">
+        <span class="label">Deuda</span>
+        <span class="val">{{ debtAmount | number:'1.2-2' }}</span>
+        <span class="pct-badge" style="color: var(--color-primary)">
+          {{ usagePercentage | number:'1.0-0' }}%
+        </span>
+      </div>
+      <div class="info-group right">
+        <span class="label">Límite</span>
+        <span class="val">{{ totalLimit | number:'1.0-0' }}</span>
+      </div>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-fill" [style.width.%]="usagePercentage"></div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <div class="date-box">
+      <div class="icon-circle">
+        <span class="material-symbols-rounded">date_range</span>
+      </div>
+      <div class="date-text">
+        <span class="d-label">Periodo Actual</span>
+        <span class="d-value period">{{ periodRange }}</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="date-box highlight">
+      <div class="icon-circle">
+        <span class="material-symbols-rounded">savings</span>
+      </div>
+      <div class="date-text">
+        <span class="d-label">Pagar el</span>
+        <span class="d-value">{{ nextPaymentDisplay }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>

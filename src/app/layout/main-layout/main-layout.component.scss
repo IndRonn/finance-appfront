@@ -1,0 +1,64 @@
+// Contenedor Maestro (Ocupa toda la pantalla)
+.layout-wrapper {
+  display: flex;          // Disposición Horizontal (Fila)
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;       // Evita scrolls dobles en el body
+  background-color: var(--color-bg-main); // Fondo claro general
+}
+
+// --- COLUMNA IZQUIERDA (Sidebar) ---
+.layout-sidebar {
+  width: var(--sidebar-width); // 260px (definido en variables globales)
+  flex-shrink: 0;         // No permitimos que se encoja
+  height: 100%;           // Ocupa toda la altura
+  z-index: 20;            // Por encima del contenido (para sombras)
+
+  // Ocultar en móviles (luego haremos el menú hamburguesa)
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+// --- COLUMNA DERECHA (Main) ---
+.layout-main {
+  flex: 1;                // Toma todo el espacio restante
+  display: flex;
+  flex-direction: column; // Header arriba, Contenido abajo
+  position: relative;
+  min-width: 0;           // Fix vital para flexbox y contenido largo
+}
+
+// Área que hace Scroll (Debajo del Header)
+.content-scrollable {
+  flex: 1;                // Ocupa todo el alto disponible debajo del header
+  overflow-y: auto;       // Scroll vertical activado
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column; // Apila contenido y footer
+
+  // Smooth scroll nativo
+  scroll-behavior: smooth;
+
+  // Personalización Scrollbar (Elegante y sutil)
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    &:hover { background-color: rgba(0, 0, 0, 0.2); }
+  }
+}
+
+// Wrapper del Router Outlet
+.page-container {
+  flex: 1;                // CRUCIAL: Empuja el footer hacia abajo
+  width: 100%;
+  max-width: 1600px;      // Evita que se estire demasiado en pantallas 4K
+  margin: 0 auto;         // Centrado horizontal
+  padding: 1rem 2.5rem;   // Espaciado interno "Luxury"
+}

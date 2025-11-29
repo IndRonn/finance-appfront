@@ -1,27 +1,46 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
+import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 
 export const routes: Routes = [
-  // Ruta por defecto: Si intenta entrar a la raíz, ver si puede ir al dashboard o al login
+  // 1. Redirección inicial (Si entran a raíz, van al dashboard)
   {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full'
   },
 
-  // Módulo de Autenticación (Público)
+  // 2. Rutas Públicas (Login/Register)
+  // Estas NO tienen layout, por eso cargan aparte.
   {
     path: 'auth',
-    loadChildren: () => import('@features/auth/auth.routes').then(m => m.AUTH_ROUTES)
-  }
+    loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
+  },
 
-  // Dashboard (Privado - Protegido por Guard)
-  // Nota: Crearemos el dashboard luego, esto es para dejar la estructura lista
-  //{
-    //path: 'dashboard',
-    //canActivate: [authGuard],
-    //loadComponent: () => import('@features/dashboard/dashhboard.component').then(m => m.DashboardComponent)
-    // ⚠️ Nota: DashboardComponent aun no existe, dará error si intentas navegar, pero compila.
-    // Si prefieres que no de error runtime, comenta estas lineas del dashboard por ahora.
-  //}
+  // 3. RUTAS PRIVADAS (LA CLAVE ESTÁ AQUÍ 👇)
+  {
+    path: '',
+    component: MainLayoutComponent, // <--- ¡AQUÍ ESTÁ LA REFERENCIA!
+    canActivate: [authGuard],       // Protege al padre y a todos los hijos
+    children: [
+      // Todo lo que pongas aquí se renderizará DENTRO del MainLayout
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
+      {
+        path: 'accounts',
+        loadComponent: () => import('./features/accounts/accounts.component').then(m => m.AccountsComponent)
+      },
+      //{
+        //path: 'transactions',
+      //loadComponent: () => import('./features/transactions/transactions.component').then(m => m.TransactionsComponent)
+      //},
+      // Futuras rutas:
+      // { path: 'budget', ... }
+    ]
+  },
+
+  // 4. Fallback (Si no encuentra nada, mándalo al dashboard)
+  { path: '**', redirectTo: 'dashboard' }
 ];

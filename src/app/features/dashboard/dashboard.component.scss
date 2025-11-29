@@ -1,0 +1,158 @@
+.dashboard-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.section-header {
+  margin-bottom: 2rem;
+
+  h2 {
+    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+  }
+  .subtitle {
+    color: var(--color-sidebar-text);
+  }
+}
+
+// --- LAYOUT GRID ---
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 1.5rem;
+
+  // El Hero Card ocupa toda la primera fila en móviles, o 2 columnas en desktop grande
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// --- TARJETA BASE ---
+.card {
+  background-color: var(--color-bg-card);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-subtle); // Sombra suave
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+}
+
+// --- HERO CARD (Destacado) ---
+.hero-card {
+  grid-column: 1 / -1; // Ocupa todo el ancho
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  // Fondo sutil con degradado muy suave
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-sidebar-text);
+
+    .label {
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+  }
+
+  .amount-wrapper h1 {
+    font-size: 4rem; // Gigante
+    margin: 0;
+    font-family: 'Lato', sans-serif; // Números limpios
+    font-weight: 300; // Elegante y fino
+    letter-spacing: -2px;
+  }
+
+  .card-footer {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: var(--color-text-body);
+    opacity: 0.8;
+  }
+}
+
+// --- METRIC CARDS (Pequeñas) ---
+.metric-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+
+    &.blue { background-color: #EFF6FF; color: #3B82F6; }
+    &.red { background-color: #FEF2F2; color: #EF4444; }
+  }
+
+  .metric-content {
+    display: flex;
+    flex-direction: column;
+
+    .label {
+      font-size: 0.8rem;
+      color: var(--color-sidebar-text);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--color-text-heading);
+      font-family: 'Lato', sans-serif;
+    }
+  }
+}
+
+// --- PRIVACY BLUR MAGIC ---
+.privacy-blur {
+  filter: blur(8px);
+  user-select: none; // Evita que seleccionen el texto para leerlo
+  transition: filter 0.3s ease;
+}
+
+// --- LOADING & ERROR ---
+.loading-state, .error-card {
+  text-align: center;
+  padding: 3rem;
+  color: var(--color-sidebar-text);
+}
+
+.spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(0,0,0,0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s infinite linear;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
