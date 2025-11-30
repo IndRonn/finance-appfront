@@ -1,1 +1,59 @@
-<p>transactions works!</p>
+<div class="history-page">
+
+  <header class="page-header">
+    <div class="title-group">
+      <h1>Movimientos</h1>
+      <p class="subtitle">Historial detallado de operaciones.</p>
+    </div>
+  </header>
+
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Recuperando archivos...</p>
+  </div>
+
+  <div *ngIf="!isLoading() && groupedTransactions().length === 0" class="empty-state">
+    <span class="material-symbols-rounded icon">receipt_long</span>
+    <p>Aún no hay movimientos registrados.</p>
+  </div>
+
+  <div *ngIf="!isLoading()" class="transactions-list">
+
+    <div *ngFor="let group of groupedTransactions()" class="day-group">
+
+      <div class="day-header">
+        <span class="date-label">{{ group.date }}</span>
+        <span class="day-total" [class.positive]="group.dailyTotal > 0">
+          {{ group.dailyTotal | currency:'PEN':'symbol':'1.2-2' }}
+        </span>
+      </div>
+
+      <div class="transactions-card">
+        <div *ngFor="let tx of group.transactions" class="transaction-item">
+
+          <div class="tx-icon" [ngClass]="tx.type">
+            <span class="material-symbols-rounded">
+              {{ tx.type === 'INGRESO' ? 'arrow_downward' : (tx.type === 'GASTO' ? 'arrow_upward' : 'sync_alt') }}
+            </span>
+          </div>
+
+          <div class="tx-details">
+            <span class="tx-desc">{{ tx.description }}</span>
+            <div class="tx-meta">
+              <span class="category">{{ tx.categoryName || 'Sin Categoría' }}</span>
+              <span class="account-badge">{{ tx.accountName }}</span>
+            </div>
+          </div>
+
+          <div class="tx-amount" [ngClass]="tx.type">
+            <span class="symbol">{{ tx.type === 'GASTO' ? '-' : '+' }}</span>
+            {{ tx.amount | currency:'PEN':'symbol':'1.2-2' }}
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

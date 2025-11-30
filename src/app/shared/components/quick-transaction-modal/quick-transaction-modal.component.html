@@ -1,1 +1,84 @@
-<p>quick-transaction-modal works!</p>
+<app-modal [isOpen]="isOpen"
+           title="Nuevo Movimiento"
+           (close)="closeModal()">
+
+  <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()" class="transaction-form">
+
+    <div class="form-group">
+      <label>Tipo de Operación</label>
+      <div class="type-selector-group">
+        <label *ngFor="let type of transactionTypes" class="type-radio-label">
+          <input type="radio" [value]="type" formControlName="type">
+          <span class="type-badge" [class.active]="currentType() === type">
+            {{ type === 'INGRESO' ? 'INGRESO' : (type === 'GASTO' ? 'GASTO' : 'TRANSFERENCIA') }}
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group amount-group">
+      <label>Monto</label>
+      <div class="input-group">
+        <span class="prefix currency-symbol">{{ sourceAccountCurrency() === 'PEN' ? 'S/' : '$' }}</span>
+        <input type="number"
+               formControlName="amount"
+               placeholder="0.00"
+               class="form-input amount-input"
+               [appAutoFocus]="isOpen">
+      </div>
+      <span class="error-text" *ngIf="transactionForm.get('amount')?.touched && transactionForm.get('amount')?.invalid">Monto requerido</span>
+    </div>
+
+    <div class="form-group">
+      <label>Cuenta de Origen</label>
+      <select formControlName="accountId" class="form-select">
+        <option [ngValue]="null" disabled>Selecciona la cuenta</option>
+        <option *ngFor="let account of accounts()" [ngValue]="account.id">
+          {{ account.name }} ({{ account.currency }})
+        </option>
+      </select>
+    </div>
+
+    <div *ngIf="currentType() === TransactionType.GASTO || currentType() === TransactionType.INGRESO">
+      <div class="form-group">
+        <label>Categoría</label>
+        <select formControlName="categoryId" class="form-select">
+          <option [ngValue]="null" disabled>Selecciona una categoría</option>
+          <option *ngFor="let cat of categories() | filter:currentType():'type'" [ngValue]="cat.id">
+            {{ cat.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div *ngIf="currentType() === TransactionType.TRANSFERENCIA">
+      <div class="form-group">
+        <label>Cuenta de Destino</label>
+        <select formControlName="destinationAccountId" class="form-select">
+          <option [ngValue]="null" disabled>Selecciona destino</option>
+          <option *ngFor="let account of accounts() | filter:transactionForm.get('accountId')?.value" [ngValue]="account.id">
+            {{ account.name }} ({{ account.currency }})
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Descripción</label>
+      <input type="text" formControlName="description" class="form-input">
+    </div>
+
+    <div class="form-group">
+      <label>Fecha</label>
+      <input type="datetime-local" formControlName="transactionDate" class="form-input">
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="transactionForm.invalid || isSubmitting()">
+        {{ isSubmitting() ? 'Registrando...' : 'Confirmar' }}
+      </button>
+    </div>
+
+  </form>
+</app-modal>

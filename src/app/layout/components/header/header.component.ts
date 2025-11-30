@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UiStateService } from '@core/services/ui-state.service';
+import { ModalStateService } from '@core/services/modal-state.service';
 
 @Component({
   selector: 'app-header',
@@ -11,6 +12,7 @@ import { UiStateService } from '@core/services/ui-state.service';
 })
 export class HeaderComponent {
   public uiState = inject(UiStateService);
+  private modalStateService = inject(ModalStateService);
 
   // Datos simulados del usuario (luego vendrán del AuthService)
   currentUser = signal({
@@ -22,8 +24,10 @@ export class HeaderComponent {
   hasNotifications = signal(true); // Para mostrar el puntito rojo
 
   openNewTransaction() {
-    console.log('✨ Nuevo Gasto clickeado');
-    // Aquí abriremos el Modal en el futuro
+    // LLAMADA AL SERVICIO GLOBAL
+    this.modalStateService.openTransactionModal();
+    // Console log ya no es necesario
+    // console.log('✨ Nuevo Gasto clickeado');
   }
 
   toggleNotifications() {

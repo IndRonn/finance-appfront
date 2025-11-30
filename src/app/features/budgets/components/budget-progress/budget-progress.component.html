@@ -1,0 +1,35 @@
+<div class="budget-card">
+
+  <div class="header">
+    <div class="info-left">
+      <span class="category-name">{{ budget.categoryName }}</span>
+
+      <span class="pct-badge" [ngClass]="statusClass">
+        {{ ratio | percent:'1.0-0' }}
+      </span>
+    </div>
+
+    <div class="amounts">
+      <span class="spent">{{ budget.spentAmount | currency:'PEN':'symbol':'1.0-0' }}</span>
+      <span class="divider">de</span>
+      <span class="limit">{{ budget.limitAmount | currency:'PEN':'symbol':'1.0-0' }}</span>
+    </div>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill"
+         [style.width.%]="widthPercentage"
+         [ngClass]="statusClass">
+    </div>
+  </div>
+
+  <div class="footer-msg">
+    <span *ngIf="budget.remainingAmount > 0" class="msg-safe">
+      Disponible: <strong>{{ budget.remainingAmount | currency:'PEN':'symbol':'1.2-2' }}</strong>
+    </span>
+    <span *ngIf="budget.remainingAmount <= 0" class="msg-danger">
+      Excedido por {{ (budget.spentAmount - budget.limitAmount) | currency:'PEN':'symbol':'1.2-2' }}
+    </span>
+  </div>
+
+</div>

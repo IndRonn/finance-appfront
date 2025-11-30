@@ -32,10 +32,18 @@ export const routes: Routes = [
         path: 'accounts',
         loadComponent: () => import('./features/accounts/accounts.component').then(m => m.AccountsComponent)
       },
-      //{
-        //path: 'transactions',
-      //loadComponent: () => import('./features/transactions/transactions.component').then(m => m.TransactionsComponent)
-      //},
+      {
+        path: 'transactions',
+        loadComponent: () => import('./features/transactions/transactions.component').then(m => m.TransactionsComponent)
+      },
+      {
+        path: 'budget', // 👈 La ruta que definimos en el Sidebar
+        loadComponent: () => import('./features/budgets/budgets.component').then(m => m.BudgetsComponent)
+      },
+      {
+        path: 'savings',
+        loadComponent: () => import('./features/savings/savings.component').then(m => m.SavingsComponent)
+      },
       // Futuras rutas:
       // { path: 'budget', ... }
     ]

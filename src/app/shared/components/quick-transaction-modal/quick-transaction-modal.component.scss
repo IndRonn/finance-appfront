@@ -1,0 +1,166 @@
+// Layout del formulario
+.transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-sidebar-text); // Gris medio
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// --- 1. SELECTOR DE TIPO (CHIPS) ---
+.type-selector-group {
+  display: flex;
+  gap: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.03);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.type-radio-label {
+  flex: 1;
+  cursor: pointer;
+  position: relative;
+
+  // Ocultamos el radio button nativo
+  input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  // Estilo del Badge
+  .type-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-body);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    // Estado Activo (Seleccionado)
+    &.active {
+      background-color: var(--color-bg-card); // Fondo blanco/gris
+      color: var(--color-primary); // Texto verde
+      border-color: var(--color-primary);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+  }
+}
+
+// --- 2. CAMPO DE MONTO (DESTACADO) ---
+.amount-group {
+  .input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .prefix {
+    position: absolute;
+    left: 1rem;
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--color-text-heading);
+    pointer-events: none;
+  }
+
+  .amount-input {
+    font-size: 1.8rem; // Texto gigante
+    padding: 1rem 1rem 1rem 3rem; // Padding izq para el símbolo
+    font-weight: 700;
+    color: var(--color-text-heading);
+    height: auto;
+
+    &::placeholder {
+      color: var(--color-gray-200);
+      font-weight: 300;
+    }
+  }
+}
+
+// --- 3. INPUTS GENERALES ---
+.form-input, .form-select {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-bg-main);
+  color: var(--color-text-heading);
+  font-family: 'Lato', sans-serif;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1); // Glow sutil si tienes la variable RGB, sino quítalo
+  }
+
+  // Placeholder styling
+  &::placeholder { color: var(--color-sidebar-text); opacity: 0.7; }
+}
+
+// --- 4. ACCIONES ---
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-body);
+  padding: 0.7rem 1.5rem;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: var(--color-gray-200);
+    color: var(--color-text-heading);
+  }
+}
+
+.btn-primary {
+  // Hereda estilos globales, pero aseguramos width en móvil
+  @media (max-width: 480px) {
+    flex: 1;
+  }
+}
+
+// --- 5. ERRORES ---
+.error-text {
+  color: var(--color-danger);
+  font-size: 0.75rem;
+  margin-top: 4px;
+  animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: translateY(0); } }

@@ -18,6 +18,11 @@
 
     </main>
 
+    <app-quick-transaction-modal
+      [isOpen]="modalStateService.isTransactionModalOpen()"
+      (close)="modalStateService.closeTransactionModal()">
+    </app-quick-transaction-modal>
+
   </div>
 
 </div>
