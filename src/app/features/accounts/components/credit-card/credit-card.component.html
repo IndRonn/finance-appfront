@@ -5,7 +5,25 @@
       <span class="bank-name">{{ account.bankName || 'BANCO' }}</span>
       <span class="card-tier">TITANIUM</span>
     </div>
-    <span class="card-type-badge">CRÉDITO</span>
+
+    <div class="header-actions-group">
+      <span class="card-type-badge">CRÉDITO</span>
+
+      <div class="action-buttons">
+        <button class="icon-btn edit" (click)="edit.emit(account)" title="Editar">
+          <span class="material-symbols-rounded">edit</span>
+        </button>
+
+        <button class="icon-btn delete"
+                [class.confirming]="isConfirmingDelete()"
+                (click)="handleDelete()"
+                [title]="isConfirmingDelete() ? '¿Confirmar?' : 'Eliminar'">
+          <span class="material-symbols-rounded">
+            {{ isConfirmingDelete() ? 'check_circle' : 'delete' }}
+          </span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="card-body">
@@ -16,7 +34,6 @@
         <span class="value">{{ availableAmount | number:'1.2-2' }}</span>
       </div>
     </div>
-
     <div class="chip-sim">
       <span></span><span></span><span></span>
     </div>
@@ -36,7 +53,6 @@
         <span class="val">{{ totalLimit | number:'1.0-0' }}</span>
       </div>
     </div>
-
     <div class="progress-track">
       <div class="progress-fill" [style.width.%]="usagePercentage"></div>
     </div>
@@ -52,9 +68,7 @@
         <span class="d-value period">{{ periodRange }}</span>
       </div>
     </div>
-
     <div class="divider"></div>
-
     <div class="date-box highlight">
       <div class="icon-circle">
         <span class="material-symbols-rounded">savings</span>

@@ -18,4 +18,12 @@ export class AccountService {
   createAccount(data: CreateAccountRequest): Observable<Account> {
     return this.http.post<Account>(this.apiUrl, data);
   }
+
+  updateAccount(id: number, data: CreateAccountRequest): Observable<Account> {
+    return this.http.put<Account>(`${this.apiUrl}/${id}`, data);
+  }
+
+  deleteAccount(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

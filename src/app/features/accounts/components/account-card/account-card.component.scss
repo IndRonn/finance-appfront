@@ -1,4 +1,5 @@
-.credit-card {
+// RENOMBRADO: .account-card
+.account-card {
   width: 100%;
   aspect-ratio: 1.586;
   border-radius: 16px;
@@ -17,82 +18,90 @@
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+
+    // Mostramos los botones al hacer hover
+    .card-actions { opacity: 1; }
   }
 }
 
 .card-top {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   font-family: 'Lato', sans-serif;
 
-  .bank-name { font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-size: 0.9rem; }
-  .card-type { font-size: 0.7rem; opacity: 0.7; }
-}
-
-.card-chip {
-  width: 45px;
-  height: 32px;
-  background: linear-gradient(135deg, #d4af37 0%, #f9e396 50%, #d4af37 100%);
-  border-radius: 6px;
-  margin-top: 1rem;
-  position: relative;
-  overflow: hidden;
-
-  .chip-line {
-    position: absolute;
-    border: 1px solid rgba(0,0,0,0.2);
-    width: 100%;
-    height: 33%;
-    &:nth-child(1) { top: 33%; }
-    &:nth-child(2) { left: 33%; height: 100%; width: 33%; top: 0; }
-  }
-}
-
-.icon-cash {
-  font-size: 2.5rem;
-  color: rgba(255, 255, 255, 0.2);
-  margin-top: 0.5rem;
-  transform: rotate(-10deg);
-  margin-left: 10px;
-}
-
-.card-balance {
-  margin-top: auto;
-  margin-bottom: 1rem;
-  font-family: 'Lato', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 300;
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-
-  // CAMBIO: Moneda en Blanco Puro
-  .currency-symbol {
-    font-size: 1rem;
-    color: #FFFFFF;
-    opacity: 1;
-    font-weight: 400;
-  }
-}
-
-.card-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-
-  .holder-info {
+  .top-left {
     display: flex;
     flex-direction: column;
-    .label { font-size: 0.5rem; opacity: 0.6; margin-bottom: 2px; }
-    .value { font-size: 0.8rem; letter-spacing: 1px; font-weight: 600; }
   }
 
-  .currency-badge {
-    background: rgba(255,255,255,0.2);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    font-weight: 700;
+  .bank-name { font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-size: 0.9rem; }
+  .card-type { font-size: 0.65rem; opacity: 0.7; margin-top: 2px; }
+}
+
+// ESTILOS DE LOS BOTONES
+.card-actions {
+  display: flex;
+  gap: 6px;
+  opacity: 0.7; // Un poco transparentes por defecto
+  transition: opacity 0.2s;
+
+  .action-btn {
+    background: rgba(0, 0, 0, 0.3);
+    border: none;
+
+    // CORRECCIÓN DE TAMAÑO:
+    width: 36px;  // Aumentado para mejor hit-area
+    height: 36px;
+
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255,255,255,0.8);
+    transition: all 0.2s;
+
+    // CORRECCIÓN DE CAPAS:
+    position: relative;
+    z-index: 20;
+
+    span {
+      font-size: 1.1rem;
+      pointer-events: none; // Evita que el icono bloquee el click
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+    }
+
+    &.delete:hover {
+      background: var(--color-danger);
+      color: #fff;
+    }
+
+    // --- NUEVO: ESTADO DE CONFIRMACIÓN ---
+    // Esto hace que el botón lata en rojo cuando se pide confirmar
+    &.confirming {
+      background: #EF4444 !important; // Rojo sólido intenso
+      color: #fff;
+      transform: scale(1.1);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+      animation: pulse 1s infinite;
+    }
   }
+}
+
+// ... Resto de estilos igual (card-chip, icon-cash, card-balance, etc.)
+.card-chip { width: 45px; height: 32px; background: linear-gradient(135deg, #d4af37 0%, #f9e396 50%, #d4af37 100%); border-radius: 6px; margin-top: 1rem; position: relative; overflow: hidden; .chip-line { position: absolute; border: 1px solid rgba(0,0,0,0.2); width: 100%; height: 33%; &:nth-child(1) { top: 33%; } &:nth-child(2) { left: 33%; height: 100%; width: 33%; top: 0; } } }
+.icon-cash { font-size: 2.5rem; color: rgba(255, 255, 255, 0.2); margin-top: 0.5rem; transform: rotate(-10deg); margin-left: 10px; }
+.card-balance { margin-top: auto; margin-bottom: 1rem; font-family: 'Lato', sans-serif; font-size: 1.8rem; font-weight: 300; display: flex; align-items: baseline; gap: 0.5rem; .currency-symbol { font-size: 1rem; color: #FFFFFF; opacity: 1; font-weight: 400; } }
+.card-bottom { display: flex; justify-content: space-between; align-items: flex-end; .holder-info { display: flex; flex-direction: column; .label { font-size: 0.5rem; opacity: 0.6; margin-bottom: 2px; } .value { font-size: 0.8rem; letter-spacing: 1px; font-weight: 600; } } .currency-badge { background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; } }
+
+// --- NUEVO: ANIMACIÓN DE LATIDO ---
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }

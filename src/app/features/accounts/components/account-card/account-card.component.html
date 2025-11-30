@@ -1,10 +1,27 @@
-<div class="credit-card" [style.background]="getCardBackground()">
+<div class="account-card" [style.background]="getCardBackground()">
 
   <div class="card-top">
-    <span class="bank-name">
-      {{ account.type === AccountType.EFECTIVO ? 'BILLETERA' : (account.bankName || 'BANCO') }}
-    </span>
-    <span class="card-type">{{ account.type }}</span>
+    <div class="top-left">
+      <span class="bank-name">
+        {{ account.type === AccountType.EFECTIVO ? 'BILLETERA' : (account.bankName || 'BANCO') }}
+      </span>
+      <span class="card-type">{{ account.type }}</span>
+    </div>
+
+    <div class="card-actions">
+      <button class="action-btn edit" (click)="$event.stopPropagation(); edit.emit(account)" title="Editar">
+        <span class="material-symbols-rounded">edit</span>
+      </button>
+
+      <button class="action-btn delete"
+              [class.confirming]="isConfirmingDelete()"
+              (click)="$event.stopPropagation(); handleDelete()"
+              [title]="isConfirmingDelete() ? '¿Confirmar?' : 'Eliminar'">
+        <span class="material-symbols-rounded">
+          {{ isConfirmingDelete() ? 'check_circle' : 'delete' }}
+        </span>
+      </button>
+    </div>
   </div>
 
   <div class="card-chip" *ngIf="account.type !== AccountType.EFECTIVO">

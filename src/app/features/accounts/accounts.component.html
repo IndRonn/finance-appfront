@@ -31,7 +31,9 @@
       <div class="cards-grid">
         <app-account-card
           *ngFor="let acc of debitAccounts()"
-          [account]="acc">
+          [account]="acc"
+          (edit)="openEditModal($event)"
+          (delete)="deleteAccount($event)">
         </app-account-card>
 
         <div *ngIf="debitAccounts().length === 0" class="empty-msg">
@@ -53,7 +55,9 @@
       <div class="cards-grid credit-grid">
         <app-credit-card
           *ngFor="let acc of creditAccounts()"
-          [account]="acc">
+          [account]="acc"
+          (edit)="openEditModal($event)"
+          (delete)="deleteAccount($event)">
         </app-credit-card>
 
         <div *ngIf="creditAccounts().length === 0" class="empty-msg">
@@ -66,8 +70,9 @@
 
 </div>
 
-<app-modal [isOpen]="isModalOpen()" title="Nueva Cuenta" (close)="isModalOpen.set(false)">
+<app-modal [isOpen]="isModalOpen()" [title]="editingAccountId() ? 'Editar Cuenta' : 'Nueva Cuenta'" (close)="closeModal()">
   <form [formGroup]="accountForm" (ngSubmit)="onSubmit()" class="modal-form">
+
     <div class="form-group">
       <label>Nombre de la Cuenta</label>
       <input type="text" formControlName="name" placeholder="Ej: Visa Signature" class="form-input">
@@ -130,9 +135,9 @@
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn-cancel" (click)="isModalOpen.set(false)">Cancelar</button>
+      <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
       <button type="submit" class="btn-primary" [disabled]="accountForm.invalid || isSubmitting()">
-        {{ isSubmitting() ? 'Guardando...' : 'Crear Cuenta' }}
+        {{ isSubmitting() ? 'Guardando...' : (editingAccountId() ? 'Actualizar' : 'Crear Cuenta') }}
       </button>
     </div>
   </form>
