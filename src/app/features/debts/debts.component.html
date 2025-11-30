@@ -1,0 +1,117 @@
+<div class="debts-page">
+
+  <header class="page-header">
+    <div class="title-group">
+      <h1>Pasivos Externos</h1>
+      <p class="subtitle">Controla tus deudas y recupera tu libertad.</p>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">
+      <span class="material-symbols-rounded">add</span>
+      Nueva Deuda
+    </button>
+  </header>
+
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Auditando pasivos...</p>
+  </div>
+
+  <div *ngIf="!isLoading()" class="debts-grid">
+
+    <app-debt-card
+      *ngFor="let debt of debts()"
+      [debt]="debt"
+      (edit)="openEdit($event)"
+      (delete)="deleteDebt($event)"
+      (amortize)="openAmortize($event)"> </app-debt-card>
+
+    <div *ngIf="debts().length === 0" class="empty-state">
+      <span class="material-symbols-rounded icon">check_circle</span>
+      <p>¡Felicidades! No tienes deudas registradas.</p>
+    </div>
+
+  </div>
+</div>
+
+<app-modal [isOpen]="isModalOpen()" [title]="modalTitle" (close)="closeModal()">
+
+  <form *ngIf="modalMode() !== 'PAY'" [formGroup]="debtForm" (ngSubmit)="onSubmitDebt()" class="modal-form">
+
+    <div class="form-group">
+      <label>Concepto</label>
+      <input type="text" formControlName="name" placeholder="Ej: Préstamo Coche" class="form-input" [appAutoFocus]="true">
+    </div>
+
+    <div class="form-group">
+      <label>Acreedor (Quién presta)</label>
+      <input type="text" formControlName="creditor" placeholder="Ej: Banco Pichincha, Tío Rico" class="form-input">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Monto Original</label>
+        <div class="input-group">
+          <span class="prefix">S/</span>
+          <input type="number" formControlName="totalAmount" class="form-input">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Saldo Pendiente</label>
+        <div class="input-group">
+          <span class="prefix">S/</span>
+          <input type="number" formControlName="currentBalance" class="form-input">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="debtForm.invalid || isSubmitting()">
+        {{ isSubmitting() ? 'Guardando...' : 'Guardar Deuda' }}
+      </button>
+    </div>
+  </form>
+
+  <form *ngIf="modalMode() === 'PAY'" [formGroup]="paymentForm" (ngSubmit)="onSubmitPayment()" class="modal-form">
+
+    <div class="info-banner">
+      <span class="material-symbols-rounded">info</span>
+      <p>Este pago se registrará como un GASTO y descontará saldo de tu cuenta.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Monto a Pagar</label>
+      <div class="input-group">
+        <span class="prefix">S/</span>
+        <input type="number" formControlName="amount" class="form-input big-input" [appAutoFocus]="true">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Cuenta de Origen</label>
+      <select formControlName="sourceAccountId" class="form-select">
+        <option [ngValue]="null" disabled>Selecciona cuenta</option>
+        <option *ngFor="let acc of accounts()" [ngValue]="acc.id">
+          {{ acc.name }} ({{ acc.initialBalance | currency:acc.currency }})
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Categoría del Gasto</label>
+      <select formControlName="categoryId" class="form-select">
+        <option [ngValue]="null" disabled>Selecciona categoría</option>
+        <option *ngFor="let cat of categories()" [ngValue]="cat.id">{{ cat.name }}</option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+      <button type="submit" class="btn-primary pay-btn" [disabled]="paymentForm.invalid || isSubmitting()">
+        {{ isSubmitting() ? 'Procesando...' : 'Confirmar Pago' }}
+      </button>
+    </div>
+  </form>
+
+</app-modal>
