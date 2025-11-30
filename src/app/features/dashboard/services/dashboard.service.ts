@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
-import { DailyStatus } from '@core/models/dashboard.model'; // Asegúrate de tener este modelo creado en la Fase 2
+import { DailyStatus, DailyCloseRequest } from '@core/models/dashboard.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,5 +13,10 @@ export class DashboardService {
 
   getDailyStatus(): Observable<DailyStatus> {
     return this.http.get<DailyStatus>(`${this.apiUrl}/status`);
+  }
+
+  // 👇 NUEVO: EJECUTAR EL RITUAL
+  closeDailyBox(data: DailyCloseRequest): Observable<any> {
+    return this.http.post(`${this.apiUrl}/close`, data);
   }
 }

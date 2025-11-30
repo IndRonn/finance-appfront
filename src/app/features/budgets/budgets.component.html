@@ -32,15 +32,52 @@
 
     <app-budget-progress
       *ngFor="let item of budgets()"
-      [budget]="item">
+      [budget]="item"
+      (edit)="openEditModal($event)"
+      (delete)="deleteBudget($event)">
     </app-budget-progress>
 
     <div *ngIf="budgets().length === 0" class="empty-state">
       <span class="material-symbols-rounded icon">fact_check</span>
-      <p>No hay presupuestos definidos para este mes.</p>
+      <p>No hay presupuestos para este mes.</p>
       <button class="btn-link" (click)="openCreateModal()">Crear el primero</button>
     </div>
-
   </div>
 
 </div>
+
+<app-modal
+  [isOpen]="isModalOpen()"
+  [title]="editingId() ? 'Modificar Límite' : 'Nuevo Presupuesto'"
+  (close)="closeModal()">
+
+  <form [formGroup]="budgetForm" (ngSubmit)="onSubmit()" class="modal-form">
+
+    <div class="form-group">
+      <label>Categoría</label>
+      <select formControlName="categoryId" class="form-select">
+        <option [ngValue]="null" disabled>Selecciona rubro</option>
+        <option *ngFor="let cat of categories()" [ngValue]="cat.id">
+          {{ cat.name }}
+        </option>
+      </select>
+      <p *ngIf="editingId()" class="helper-text">Para cambiar la categoría, elimina y crea uno nuevo.</p>
+    </div>
+
+    <div class="form-group">
+      <label>Límite Mensual</label>
+      <div class="input-group">
+        <span class="prefix">S/</span>
+        <input type="number" formControlName="limitAmount" class="form-input" [appAutoFocus]="true">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="budgetForm.invalid || isSubmitting()">
+        {{ isSubmitting() ? 'Guardando...' : (editingId() ? 'Actualizar' : 'Asignar') }}
+      </button>
+    </div>
+
+  </form>
+</app-modal>

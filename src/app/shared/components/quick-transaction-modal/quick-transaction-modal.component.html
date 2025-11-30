@@ -33,10 +33,12 @@
       <label>Cuenta de Origen</label>
       <select formControlName="accountId" class="form-select">
         <option [ngValue]="null" disabled>Selecciona la cuenta</option>
+
         <option *ngFor="let account of accounts()" [ngValue]="account.id">
-          {{ account.name }} ({{ account.currency }})
+          {{ account.name }} — {{ account.initialBalance | currency:account.currency:'symbol':'1.2-2' }}
         </option>
       </select>
+      <span class="error-text" *ngIf="transactionForm.get('accountId')?.touched && transactionForm.get('accountId')?.invalid">Cuenta requerida</span>
     </div>
 
     <div *ngIf="currentType() === TransactionType.GASTO || currentType() === TransactionType.INGRESO">
@@ -56,8 +58,9 @@
         <label>Cuenta de Destino</label>
         <select formControlName="destinationAccountId" class="form-select">
           <option [ngValue]="null" disabled>Selecciona destino</option>
+
           <option *ngFor="let account of accounts() | filter:transactionForm.get('accountId')?.value" [ngValue]="account.id">
-            {{ account.name }} ({{ account.currency }})
+            {{ account.name }} — {{ account.initialBalance | currency:account.currency:'symbol':'1.2-2' }}
           </option>
         </select>
       </div>

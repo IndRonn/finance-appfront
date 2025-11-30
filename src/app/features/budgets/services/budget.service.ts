@@ -28,4 +28,12 @@ export class BudgetService {
   createBudget(data: BudgetRequest): Observable<BudgetResponse> {
     return this.http.post<BudgetResponse>(this.apiUrl, data);
   }
+
+  updateBudget(id: number, data: BudgetRequest): Observable<BudgetResponse> {
+    return this.http.put<BudgetResponse>(`${this.apiUrl}/${id}`, data);
+  }
+
+  deleteBudget(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

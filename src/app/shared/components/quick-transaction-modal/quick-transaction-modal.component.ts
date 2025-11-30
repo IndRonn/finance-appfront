@@ -122,6 +122,7 @@ export class QuickTransactionModalComponent implements OnInit {
     this.transactionService.createTransaction(request).subscribe({
       next: (response) => {
         console.log('Transaction success', response);
+        this.accountService.notifyRefresh();
         this.isSubmitting.set(false);
         this.closeModal(); // Cierra y limpia
         this.transactionForm.reset({

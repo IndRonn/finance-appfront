@@ -4,12 +4,13 @@ import { Injectable, signal, effect } from '@angular/core';
   providedIn: 'root'
 })
 export class UiStateService {
-  // Signal para el Modo Privacidad (Blur)
-  // Leemos del localStorage al iniciar para recordar la preferencia
+  // Signal para el Modo Privacidad
   readonly isPrivacyMode = signal<boolean>(localStorage.getItem('privacy_mode') === 'true');
 
+  // 👇 AGREGAMOS ESTO (La propiedad que faltaba)
+  readonly currentDate = new Date();
+
   constructor() {
-    // Effect: Cada vez que cambie la signal, guardamos en localStorage automáticamente
     effect(() => {
       localStorage.setItem('privacy_mode', String(this.isPrivacyMode()));
     });

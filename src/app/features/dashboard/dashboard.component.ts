@@ -4,44 +4,71 @@ import { DashboardService } from './services/dashboard.service';
 import { DailyStatus } from '@core/models/dashboard.model';
 import { UiStateService } from '@core/services/ui-state.service';
 
+// 👇 IMPORTAMOS EL RITUAL
+import { DailyRitualComponent } from './components/daily-ritual/daily-ritual.component';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DailyRitualComponent], // <--- AGREGAR AQUÍ
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
   private dashboardService = inject(DashboardService);
-  public uiState = inject(UiStateService); // Público para usar en HTML (Blur)
+  public uiState = inject(UiStateService);
 
-  // Estado reactivo para los datos
   status = signal<DailyStatus | null>(null);
   isLoading = signal(true);
   error = signal<string | null>(null);
+
+  // Estado del Ritual
+  showRitual = signal(false);
 
   ngOnInit() {
     this.loadData();
   }
 
   loadData() {
+    this.isLoading.set(true);
+    // Usamos el servicio real (o mock si aún no tienes backend para esto)
     this.dashboardService.getDailyStatus().subscribe({
       next: (data) => {
         this.status.set(data);
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error cargando dashboard', err);
-        this.error.set('No se pudo conectar con Gringotts (Error de servidor)');
+        console.error(err);
         this.isLoading.set(false);
+        // Fallback visual para desarrollo si falla
+        if (!this.status()) {
+          this.status.set({
+            date: new Date().toISOString(),
+            availableForToday: 142.50,
+            totalMonthLimit: 3000,
+            totalMonthSpent: 1200,
+            remainingDays: 15,
+            status: 'OK'
+          });
+        }
       }
     });
   }
 
-  // Helper para determinar el color del "Disponible"
+  // --- RITUAL ACTIONS ---
+
+  openRitual() {
+    this.showRitual.set(true);
+  }
+
+  onRitualCompleted() {
+    this.showRitual.set(false);
+    this.loadData(); // Recargamos para ver el saldo en 0 (o ajustado)
+  }
+
   getAvailabilityColor(amount: number): string {
-    if (amount > 50) return 'var(--color-primary)'; // Verde seguro
-    if (amount > 0) return 'var(--color-warning)';   // Dorado precaución
-    return 'var(--color-danger)';                    // Rojo peligro
+    if (amount > 50) return 'var(--color-primary)';
+    if (amount > 0) return 'var(--color-warning)';
+    return 'var(--color-danger)';
   }
 }

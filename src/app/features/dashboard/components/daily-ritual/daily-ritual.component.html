@@ -1,0 +1,67 @@
+<div class="ritual-overlay">
+  <div class="ritual-card">
+
+    <div class="ritual-header">
+      <h2>Cierre del Día</h2>
+      <p class="date">{{ status.date | date:'fullDate' | titlecase }}</p>
+    </div>
+
+    <div class="result-display">
+      <span class="label">Sobrante del día</span>
+      <h1 class="amount positive">+ {{ status.availableForToday | currency:'PEN':'symbol':'1.2-2' }}</h1>
+    </div>
+
+    <div class="step-decision" *ngIf="step() === 1">
+      <p class="prompt">¿Qué haremos con este excedente?</p>
+
+      <div class="cards-row">
+        <button class="choice-card gold" (click)="selectAction('SAVE')">
+          <div class="icon"><span class="material-symbols-rounded">savings</span></div>
+          <h3>Ahorrar</h3>
+          <p>Enviar a una Bóveda</p>
+        </button>
+
+        <button class="choice-card blue" (click)="selectAction('ROLLOVER')">
+          <div class="icon"><span class="material-symbols-rounded">forward</span></div>
+          <h3>Acumular</h3>
+          <p>Sumar a mañana</p>
+        </button>
+      </div>
+
+      <button class="btn-text" (click)="close.emit()">Decidir luego</button>
+    </div>
+
+    <div class="step-details" *ngIf="step() === 2">
+      <form [formGroup]="ritualForm" (ngSubmit)="submitRitual()">
+
+        <div class="form-group" *ngIf="selectedAction() === 'SAVE'">
+          <label>Destino (Bóveda)</label>
+          <select formControlName="targetGoalId" class="form-select input-dark">
+            <option [ngValue]="null">Selecciona Meta</option>
+            <option *ngFor="let g of goals()" [ngValue]="g.id">{{ g.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Origen Real del Dinero</label>
+          <select formControlName="sourceAccountId" class="form-select input-dark">
+            <option [ngValue]="null">Selecciona Cuenta</option>
+            <option *ngFor="let acc of accounts()" [ngValue]="acc.id">
+              {{ acc.name }} ({{ acc.initialBalance | currency:acc.currency }})
+            </option>
+          </select>
+          <p class="helper">El dinero se moverá de esta cuenta.</p>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn-back" (click)="step.set(1)">Volver</button>
+          <button type="submit" class="btn-confirm" [disabled]="ritualForm.invalid || isSubmitting()">
+            {{ isSubmitting() ? 'Procesando...' : 'Ejecutar Cierre' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>

@@ -1,158 +1,140 @@
 .dashboard-container {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
-  animation: fadeIn 0.5s ease-out;
+  animation: fadeIn 0.6s ease-out;
 }
 
 .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
   margin-bottom: 2rem;
 
-  h2 {
-    margin-bottom: 0.5rem;
-    font-size: 1.8rem;
-  }
-  .subtitle {
-    color: var(--color-sidebar-text);
+  h2 { margin: 0 0 0.2rem 0; font-size: 2rem; line-height: 1.1; }
+  .subtitle { margin: 0; color: var(--color-sidebar-text); font-size: 0.95rem; }
+
+  .date-badge {
+    background: rgba(0,0,0,0.05);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--color-text-heading);
+    font-weight: 600;
+    text-transform: capitalize;
   }
 }
 
-// --- LAYOUT GRID ---
+// GRID
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto auto;
   gap: 1.5rem;
 
-  // El Hero Card ocupa toda la primera fila en móviles, o 2 columnas en desktop grande
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
 }
 
-// --- TARJETA BASE ---
+// TARJETA BASE
 .card {
   background-color: var(--color-bg-card);
-  border-radius: var(--border-radius-lg);
-  padding: 1.5rem;
+  border-radius: 20px;
+  padding: 2rem;
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-subtle); // Sombra suave
-  transition: transform 0.2s, box-shadow 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  }
-}
-
-// --- HERO CARD (Destacado) ---
-.hero-card {
-  grid-column: 1 / -1; // Ocupa todo el ancho
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 1.5rem;
-  text-align: center;
+  box-shadow: var(--shadow-subtle);
   position: relative;
   overflow: hidden;
+  transition: transform 0.3s;
 
-  // Fondo sutil con degradado muy suave
+  &:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+}
+
+// --- HERO CARD (CLEAN STYLE) ---
+.hero-card {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  align-items: center;
+  min-height: 300px;
+
+  // Fondo Claro Original
   background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 100%);
 
   .card-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    color: var(--color-sidebar-text);
+    gap: 1rem;
 
-    .label {
-      font-size: 0.85rem;
-      letter-spacing: 2px;
-      font-weight: 700;
-      text-transform: uppercase;
+    .label { font-size: 0.8rem; letter-spacing: 2px; font-weight: 700; color: var(--color-sidebar-text); }
+
+    .icon-circle {
+      width: 48px; height: 48px;
+      background: rgba(0,0,0,0.03);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-heading);
     }
   }
 
   .amount-wrapper h1 {
-    font-size: 4rem; // Gigante
-    margin: 0;
-    font-family: 'Lato', sans-serif; // Números limpios
-    font-weight: 300; // Elegante y fino
+    font-size: 4.5rem;
+    font-weight: 300;
+    margin: 1rem 0;
     letter-spacing: -2px;
+    font-family: 'Lato', sans-serif;
+    // El color se define inline en el HTML (getAvailabilityColor)
   }
 
   .card-footer {
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    color: var(--color-text-body);
-    opacity: 0.8;
+    margin-bottom: 1.5rem;
+    .info-text { font-size: 0.95rem; color: var(--color-text-body); opacity: 0.8; }
+  }
+
+  // BOTÓN NEGRO (El que te gustaba)
+  .btn-ritual {
+    background: linear-gradient(135deg, #111827 0%, #000000 100%);
+    color: #fff;
+    border: none;
+    padding: 0.8rem 2.5rem;
+    border-radius: 30px;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 0.6rem;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+
+    span { font-size: 1.2rem; color: var(--color-primary); } // Mazo verde
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
   }
 }
 
-// --- METRIC CARDS (Pequeñas) ---
+// METRICS
 .metric-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  display: flex; align-items: center; gap: 1.5rem;
 
   .icon-box {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-
-    &.blue { background-color: #EFF6FF; color: #3B82F6; }
-    &.red { background-color: #FEF2F2; color: #EF4444; }
+    width: 50px; height: 50px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+    &.blue { background-color: #ecfdf5; color: #10b981; }
+    &.red { background-color: #fef2f2; color: #ef4444; }
   }
 
   .metric-content {
-    display: flex;
-    flex-direction: column;
-
-    .label {
-      font-size: 0.8rem;
-      color: var(--color-sidebar-text);
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .value {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--color-text-heading);
-      font-family: 'Lato', sans-serif;
-    }
+    display: flex; flex-direction: column;
+    .label { font-size: 0.8rem; color: var(--color-sidebar-text); font-weight: 700; text-transform: uppercase; }
+    .value { font-size: 1.6rem; font-weight: 700; color: var(--color-text-heading); font-family: 'Lato', sans-serif; }
   }
 }
 
-// --- PRIVACY BLUR MAGIC ---
-.privacy-blur {
-  filter: blur(8px);
-  user-select: none; // Evita que seleccionen el texto para leerlo
-  transition: filter 0.3s ease;
-}
-
-// --- LOADING & ERROR ---
-.loading-state, .error-card {
-  text-align: center;
-  padding: 3rem;
-  color: var(--color-sidebar-text);
-}
-
-.spinner {
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  border: 3px solid rgba(0,0,0,0.1);
-  border-top-color: var(--color-primary);
-  border-radius: 50%;
-  animation: spin 1s infinite linear;
-  margin-bottom: 1rem;
-}
-
+.privacy-blur { filter: blur(8px); user-select: none; }
+.loading-state { text-align: center; padding: 4rem; color: var(--color-sidebar-text); }
+.spinner { width: 30px; height: 30px; border: 3px solid var(--color-border); border-top-color: var(--color-primary); border-radius: 50%; animation: spin 1s infinite linear; margin: 0 auto 1rem; }
 @keyframes spin { to { transform: rotate(360deg); } }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

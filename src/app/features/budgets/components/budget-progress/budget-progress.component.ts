@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BudgetResponse } from '@core/models/budget.model';
 
@@ -11,6 +11,8 @@ import { BudgetResponse } from '@core/models/budget.model';
 })
 export class BudgetProgressComponent {
   @Input({ required: true }) budget!: BudgetResponse;
+  @Output() edit = new EventEmitter<BudgetResponse>();
+  @Output() delete = new EventEmitter<number>();
 
   /**
    * Calculamos el ratio forzando tipos numéricos para evitar errores con strings.

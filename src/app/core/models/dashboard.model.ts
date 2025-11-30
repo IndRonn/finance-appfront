@@ -8,8 +8,10 @@ export interface DailyStatus {
 }
 
 export interface DailyCloseRequest {
-  date: string;
+  date: string; // YYYY-MM-DD
   amount: number;
   action: 'SAVE' | 'ROLLOVER';
-  targetSavingsGoalId?: number;
+  targetSavingsGoalId?: number; // Solo si action es SAVE
+  sourceAccountId?: number;     // De dónde sale la plata real
+  categoryId?: number;          // Opcional, para clasificar el movimiento
 }

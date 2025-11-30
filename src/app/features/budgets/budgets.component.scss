@@ -103,3 +103,28 @@
     }
   }
 }
+
+.budget-wrapper {
+  position: relative;
+
+  // Si quisieras un botón de borrar flotante a la derecha de la barra
+  .btn-delete-mini {
+    position: absolute;
+    top: 10px;
+    right: -30px; // Fuera de la tarjeta
+    background: none; border: none; color: var(--color-danger);
+    font-size: 1.5rem; cursor: pointer; opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  &:hover .btn-delete-mini { opacity: 1; }
+}
+
+// Estilos de Formulario (Copia y pega de accounts si no son globales)
+.modal-form { display: flex; flex-direction: column; gap: 1.2rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.5rem; label { font-weight: 600; font-size: 0.85rem; color: var(--color-text-heading); } }
+.form-input, .form-select { padding: 0.8rem; border: 1px solid var(--color-border); border-radius: 6px; font-family: 'Lato', sans-serif; font-size: 1rem; }
+.input-group { position: relative; display: flex; align-items: center; .prefix { position: absolute; left: 10px; opacity: 0.6; } input { padding-left: 2rem; width: 100%; } }
+.helper-text { font-size: 0.8rem; color: var(--color-sidebar-text); margin: 0; }
+.form-actions { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+.btn-cancel { background: transparent; border: 1px solid var(--color-border); padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; }

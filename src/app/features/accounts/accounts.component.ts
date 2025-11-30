@@ -70,6 +70,16 @@ export class AccountsComponent implements OnInit {
   ngOnInit() {
     this.loadAccounts();
     this.setupTypeChanges(); // Activa la escucha de cambios de tipo
+    this.setupAutoRefresh();
+  }
+
+  private setupAutoRefresh() {
+    this.accountService.refreshNeeded$
+      .pipe(takeUntilDestroyed(this.destroyRef)) // Importante: Limpia suscripción al destruir componente
+      .subscribe(() => {
+        // Cuando suene la alarma, recargamos los datos silenciosamente
+        this.loadAccounts();
+      });
   }
 
   loadAccounts() {
@@ -116,6 +126,7 @@ export class AccountsComponent implements OnInit {
     limitControl?.updateValueAndValidity();
     closingControl?.updateValueAndValidity();
     paymentControl?.updateValueAndValidity();
+    this.accountService.notifyRefresh();
   }
 
   // --- ACCIONES DEL USUARIO (CRUD) ---
