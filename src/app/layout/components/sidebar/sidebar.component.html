@@ -42,7 +42,27 @@
       <span class="label">Deudas</span>
     </a>
 
+    <a routerLink="/bills" routerLinkActive="active" class="nav-item">
+      <span class="material-symbols-rounded icon">receipt_long</span>
+      <span class="label">Servicios</span>
+    </a>
+
   </nav>
+
+  <div class="wealth-widget">
+    <div class="wealth-row">
+      <span class="w-label">Activos</span>
+      <span class="w-value success">
+        {{ accountService.totalLiquidity() | currency:'PEN':'symbol':'1.0-0' }}
+      </span>
+    </div>
+    <div class="wealth-row">
+      <span class="w-label">Pasivos</span>
+      <span class="w-value danger">
+        {{ accountService.totalDebt() | currency:'PEN':'symbol':'1.0-0' }}
+      </span>
+    </div>
+  </div>
 
   <div class="sidebar-footer">
     <button class="nav-item logout" (click)="logout()">

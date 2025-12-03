@@ -12,57 +12,57 @@ import { Currency } from '@core/models/enums.model';
 })
 export class CreditCardComponent implements OnInit, OnChanges {
   @Input({ required: true }) account!: Account;
-  // RESTAURAMOS LOS OUTPUTS
   @Output() edit = new EventEmitter<Account>();
   @Output() delete = new EventEmitter<number>();
 
   Currency = Currency;
 
-  availableAmount = 0;
-  debtAmount = 0;
-  totalLimit = 0;
-  usagePercentage = 0;
+  // --- VARIABLES VISUALES (LA TRÍADA) ---
+  totalLimit = 0;       // Techo
+  debtTotal = 0;        // Deuda Total (InitialBalance)
+  statementAmount = 0;  // A Pagar YA
+  currentCycle = 0;     // A Pagar Luego (Nuevo)
+
+  availableAmount = 0;  // Disponible Real
+  usagePercentage = 0;  // Para la barra
+
+  // Fechas
   periodRange: string = '--';
   nextPaymentDisplay: string = '--';
 
-  // Estado para confirmación de borrado
   isConfirmingDelete = signal(false);
 
-  ngOnInit() {
-    this.refreshData();
-  }
-
-  ngOnChanges() {
-    this.refreshData();
-  }
+  ngOnInit() { this.refreshData(); }
+  ngOnChanges() { this.refreshData(); }
 
   handleDelete() {
     if (this.isConfirmingDelete()) {
-      // Si ya estaba confirmando, emitimos el borrado real
       this.delete.emit(this.account.id);
     } else {
-      // Primera vez: activamos estado de confirmación
       this.isConfirmingDelete.set(true);
-      // Timeout para cancelar si se arrepiente (3 segundos)
       setTimeout(() => this.isConfirmingDelete.set(false), 3000);
     }
   }
 
-  // ... (El resto de métodos calculateFinancials, calculateDates, getBackground se mantienen IGUAL) ...
-  // Asegúrate de incluir el método getBackground() que ya tenías.
-
   private refreshData() {
-    this.calculateFinancials();
+    this.mapFinancials();
     this.calculateDates();
   }
 
-  private calculateFinancials() {
+  private mapFinancials() {
+    // 1. Mapeo Directo (Sin cálculos raros, confiamos en el Backend)
     this.totalLimit = Number(this.account.creditLimit) || 0;
-    this.debtAmount = Number(this.account.initialBalance) || 0;
-    this.availableAmount = Math.max(0, this.totalLimit - this.debtAmount);
 
+    this.debtTotal = Number(this.account.initialBalance) || 0;        // TOTAL
+    this.statementAmount = Number(this.account.statementBalance) || 0;// FACTURADO
+    this.currentCycle = Number(this.account.currentCycleBalance) || 0;// NUEVO
+
+    // 2. El Disponible siempre es: Límite - Deuda Total
+    this.availableAmount = Math.max(0, this.totalLimit - this.debtTotal);
+
+    // 3. Barra de Progreso (Salud Crediticia)
     if (this.totalLimit > 0) {
-      this.usagePercentage = (this.debtAmount / this.totalLimit) * 100;
+      this.usagePercentage = (this.debtTotal / this.totalLimit) * 100;
       this.usagePercentage = Math.min(this.usagePercentage, 100);
     } else {
       this.usagePercentage = 0;
@@ -70,39 +70,38 @@ export class CreditCardComponent implements OnInit, OnChanges {
   }
 
   private calculateDates() {
-    if (this.account.closingDate === null || this.account.closingDate === undefined ||
-      this.account.paymentDate === null || this.account.paymentDate === undefined) {
+    if (!this.account.closingDate || !this.account.paymentDate) {
       this.periodRange = '--';
       this.nextPaymentDisplay = '--';
       return;
     }
 
     const today = new Date();
+    today.setHours(0,0,0,0);
     const currentDay = today.getDate();
     const closingDay = Number(this.account.closingDate);
     const paymentDay = Number(this.account.paymentDate);
 
-    let periodStart: Date, periodEnd: Date;
+    let cycleStart: Date, cycleEnd: Date;
 
+    // Lógica de Visualización de Periodo
     if (currentDay <= closingDay) {
-      periodStart = new Date(today.getFullYear(), today.getMonth() - 1, closingDay + 1);
-      periodEnd = new Date(today.getFullYear(), today.getMonth(), closingDay);
+      cycleEnd = new Date(today.getFullYear(), today.getMonth(), closingDay);
+      cycleStart = new Date(today.getFullYear(), today.getMonth() - 1, closingDay + 1);
     } else {
-      periodStart = new Date(today.getFullYear(), today.getMonth(), closingDay + 1);
-      periodEnd = new Date(today.getFullYear(), today.getMonth() + 1, closingDay);
+      cycleEnd = new Date(today.getFullYear(), today.getMonth() + 1, closingDay);
+      cycleStart = new Date(today.getFullYear(), today.getMonth(), closingDay + 1);
     }
 
     const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short' });
-    this.periodRange = `${fmt.format(periodStart)} - ${fmt.format(periodEnd)}`;
+    this.periodRange = `${fmt.format(cycleStart)} - ${fmt.format(cycleEnd)}`;
 
-    let paymentDateReal = new Date(periodEnd.getFullYear(), periodEnd.getMonth(), paymentDay);
-    if (paymentDay < closingDay) {
-      paymentDateReal.setMonth(paymentDateReal.getMonth() + 1);
+    // Lógica Visual de Fecha de Pago
+    let targetPayDate = new Date(today.getFullYear(), today.getMonth(), paymentDay);
+    if (today.getDate() > paymentDay) {
+      targetPayDate.setMonth(targetPayDate.getMonth() + 1);
     }
-
-    this.nextPaymentDisplay = new Intl.DateTimeFormat('es-ES', {
-      day: 'numeric', month: 'long'
-    }).format(paymentDateReal);
+    this.nextPaymentDisplay = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long' }).format(targetPayDate);
   }
 
   getBackground(): string {

@@ -61,10 +61,13 @@
 
     // Estado Activo (Seleccionado)
     &.active {
-      background-color: var(--color-bg-card); // Fondo blanco/gris
+      background-color: var(--color-bg-card);
       color: var(--color-primary); // Texto verde
-      border-color: var(--color-primary);
+      border-color: var(--color-border);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+      // Opcional: Borde verde sutil
+      border-color: var(--color-primary);
     }
   }
 }
@@ -91,10 +94,10 @@
     padding: 1rem 1rem 1rem 3rem; // Padding izq para el símbolo
     font-weight: 700;
     color: var(--color-text-heading);
-    height: auto;
+    height: auto; // Deja que el padding defina la altura
 
     &::placeholder {
-      color: var(--color-gray-200);
+      color: rgba(0,0,0,0.2);
       font-weight: 300;
     }
   }
@@ -105,7 +108,7 @@
   width: 100%;
   padding: 0.8rem;
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-sm);
+  border-radius: 8px; // Un poco más redondeado (moderno)
   background-color: var(--color-bg-main);
   color: var(--color-text-heading);
   font-family: 'Lato', sans-serif;
@@ -115,11 +118,14 @@
   &:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1); // Glow sutil si tienes la variable RGB, sino quítalo
+    // Glow verde suave (Hardcoded para asegurar que funcione)
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
   }
 
-  // Placeholder styling
-  &::placeholder { color: var(--color-sidebar-text); opacity: 0.7; }
+  &::placeholder {
+    color: var(--color-sidebar-text);
+    opacity: 0.7;
+  }
 }
 
 // --- 4. ACCIONES ---
@@ -127,7 +133,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   padding-top: 1rem;
   border-top: 1px solid var(--color-border);
 }
@@ -137,19 +143,20 @@
   border: 1px solid var(--color-border);
   color: var(--color-text-body);
   padding: 0.7rem 1.5rem;
-  border-radius: var(--border-radius-sm);
+  border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: var(--color-gray-200);
+    background-color: rgba(0,0,0,0.05);
     color: var(--color-text-heading);
   }
 }
 
 .btn-primary {
-  // Hereda estilos globales, pero aseguramos width en móvil
+  // Hereda estilos globales (.btn-primary en styles.scss)
+  // Aseguramos que sea ancho en móvil
   @media (max-width: 480px) {
     flex: 1;
   }
@@ -161,6 +168,7 @@
   font-size: 0.75rem;
   margin-top: 4px;
   animation: fadeIn 0.2s;
+  display: block;
 }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-2px); } to { opacity: 1; transform: translateY(0); } }

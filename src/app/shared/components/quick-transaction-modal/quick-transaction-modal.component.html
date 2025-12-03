@@ -35,7 +35,7 @@
         <option [ngValue]="null" disabled>Selecciona la cuenta</option>
 
         <option *ngFor="let account of accounts()" [ngValue]="account.id">
-          {{ account.name }} — {{ account.initialBalance | currency:account.currency:'symbol':'1.2-2' }}
+          {{ getAccountDisplayLabel(account) }}
         </option>
       </select>
       <span class="error-text" *ngIf="transactionForm.get('accountId')?.touched && transactionForm.get('accountId')?.invalid">Cuenta requerida</span>
@@ -60,7 +60,7 @@
           <option [ngValue]="null" disabled>Selecciona destino</option>
 
           <option *ngFor="let account of accounts() | filter:transactionForm.get('accountId')?.value" [ngValue]="account.id">
-            {{ account.name }} — {{ account.initialBalance | currency:account.currency:'symbol':'1.2-2' }}
+            {{ getAccountDisplayLabel(account) }}
           </option>
         </select>
       </div>

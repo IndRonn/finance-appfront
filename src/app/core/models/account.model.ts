@@ -6,13 +6,16 @@ export interface Account {
   type: AccountType;
   currency: Currency;
   bankName?: string;
-  initialBalance: number; // Nota: En TC, esto es la DEUDA ACTUAL (Positivo)
+  initialBalance: number; // En TC: Deuda Total Acumulada
   isActive: boolean;
 
-  // Nuevos campos oficiales del Backend
-  creditLimit?: number;   // Viene null en Débito/Efectivo
-  closingDate?: number;
-  paymentDate?: number;
+  statementBalance?: number;    // A Pagar (Facturado)
+  currentCycleBalance?: number;
+  // Datos de Crédito
+  creditLimit?: number;
+  closingDate?: number | null;
+  paymentDate?: number | null;
+
 }
 
 export interface CreateAccountRequest {
@@ -26,4 +29,7 @@ export interface CreateAccountRequest {
   creditLimit?: number;
   closingDate?: number;
   paymentDate?: number;
+
+  previousBalance?: number; // Deuda ya facturada (Ciclo cerrado)
+  currentBalance?: number;  // Deuda flotante (Ciclo actual)
 }

@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import { environment } from '@env/environment';
 import { Transaction, CreateTransactionRequest } from '@core/models/transaction.model';
+import { AccountService } from '@features/accounts/services/account.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,16 +11,31 @@ import { Transaction, CreateTransactionRequest } from '@core/models/transaction.
 export class TransactionService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/transactions`;
+  private accountService = inject(AccountService);
 
   /** Crea una nueva transacción (Gasto, Ingreso, Transferencia) */
   createTransaction(data: CreateTransactionRequest): Observable<Transaction> {
-    return this.http.post<Transaction>(this.apiUrl, data);
+    return this.http.post<Transaction>(this.apiUrl, data).pipe(
+      tap(() => this.accountService.notifyRefresh()) // ⚠️ IMPORTANTE: Avisar que el saldo cambió
+    );
   }
 
-  /** Obtiene el historial completo */
+  // LISTAR
   getHistory(): Observable<Transaction[]> {
     return this.http.get<Transaction[]>(this.apiUrl);
   }
 
-  // Aquí irán updateTransaction y deleteTransaction más adelante
+  // EDITAR
+  updateTransaction(id: number, data: CreateTransactionRequest): Observable<Transaction> {
+    return this.http.put<Transaction>(`${this.apiUrl}/${id}`, data).pipe(
+      tap(() => this.accountService.notifyRefresh()) // El saldo se recalcula en backend, avisamos al front
+    );
+  }
+
+  // ELIMINAR
+  deleteTransaction(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => this.accountService.notifyRefresh()) // El dinero vuelve a la cuenta, avisamos
+    );
+  }
 }

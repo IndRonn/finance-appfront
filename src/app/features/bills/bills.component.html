@@ -1,0 +1,105 @@
+<div class="bills-page">
+  <header class="page-header">
+    <div class="title-group">
+      <h1>Recibos de Servicios</h1>
+      <p class="subtitle">Controla tus vencimientos y evita cortes.</p>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">
+      <span class="material-symbols-rounded">add</span> Nuevo Recibo
+    </button>
+  </header>
+
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+  </div>
+
+  <div *ngIf="!isLoading()" class="bills-grid">
+    <app-bill-card
+      *ngFor="let bill of bills()"
+      [bill]="bill"
+      (pay)="openPay($event)"
+      (clone)="openClone($event)"
+      (edit)="openEdit($event)"
+      (delete)="deleteBill($event)">
+    </app-bill-card>
+
+    <div *ngIf="bills().length === 0" class="empty-state">
+      <span class="material-symbols-rounded icon">check_circle</span>
+      <p>Estás al día. No hay recibos pendientes o registrados.</p>
+    </div>
+  </div>
+</div>
+
+<app-modal [isOpen]="isFormModalOpen()" [title]="editingId() ? 'Editar Recibo' : 'Registrar Recibo'" (close)="isFormModalOpen.set(false)">
+  <form [formGroup]="billForm" (ngSubmit)="onSubmitBill()" class="modal-form">
+
+    <div class="form-group">
+      <label>Nombre del Servicio</label>
+      <input type="text" formControlName="name" placeholder="Ej: Luz Casa, Internet" class="form-input" [appAutoFocus]="true">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Empresa</label>
+        <input type="text" formControlName="company" placeholder="Ej: Hidrandina" class="form-input">
+      </div>
+      <div class="form-group">
+        <label>N° Suministro</label>
+        <input type="text" formControlName="serviceCode" placeholder="Para referencia" class="form-input">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Categoría</label>
+      <select formControlName="categoryId" class="form-select">
+        <option [ngValue]="null" disabled>Selecciona</option>
+        <option *ngFor="let cat of categories()" [ngValue]="cat.id">{{ cat.name }}</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Monto</label>
+        <div class="input-group">
+          <input type="number" formControlName="amount" class="form-input">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Vencimiento</label>
+        <input type="date" formControlName="dueDate" class="form-input">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="isFormModalOpen.set(false)">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="billForm.invalid || isSubmitting()">Guardar</button>
+    </div>
+  </form>
+</app-modal>
+
+<app-modal [isOpen]="isPayModalOpen()" title="Pagar Recibo" (close)="isPayModalOpen.set(false)">
+  <form [formGroup]="payForm" (ngSubmit)="onSubmitPay()" class="modal-form">
+
+    <div class="info-banner">
+      <span class="material-symbols-rounded">info</span>
+      <p>Se registrará el gasto y se descontará el saldo automáticamente.</p>
+    </div>
+
+    <div class="form-group">
+      <label>¿Con qué cuenta pagas?</label>
+      <select formControlName="sourceAccountId" class="form-select input-dark" [appAutoFocus]="true">
+        <option [ngValue]="null" disabled>Selecciona cuenta</option>
+        <option *ngFor="let acc of accounts()" [ngValue]="acc.id">
+          {{ acc.name }} ({{ acc.initialBalance | currency:acc.currency }})
+        </option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="isPayModalOpen.set(false)">Cancelar</button>
+      <button type="submit" class="btn-primary pay-btn" [disabled]="payForm.invalid || isSubmitting()">
+        {{ isSubmitting() ? 'Procesando...' : 'Confirmar Pago' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

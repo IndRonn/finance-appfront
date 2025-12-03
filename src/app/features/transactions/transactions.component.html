@@ -29,6 +29,7 @@
       </div>
 
       <div class="transactions-card">
+
         <div *ngFor="let tx of group.transactions" class="transaction-item">
 
           <div class="tx-icon" [ngClass]="tx.type">
@@ -39,15 +40,36 @@
 
           <div class="tx-details">
             <span class="tx-desc">{{ tx.description }}</span>
+
             <div class="tx-meta">
-              <span class="category">{{ tx.categoryName || 'Sin Categoría' }}</span>
-              <span class="account-badge">{{ tx.accountName }}</span>
+              <ng-container *ngIf="tx.type === TransactionType.TRANSFERENCIA; else standardMeta">
+                <span class="transfer-flow">
+                  {{ tx.accountName }}
+                  <span class="material-symbols-rounded arrow-icon">arrow_right_alt</span>
+                  {{ tx.destinationAccountName || 'Destino' }}
+                </span>
+              </ng-container>
+
+              <ng-template #standardMeta>
+                <span class="category">{{ tx.categoryName || 'Sin Categoría' }}</span>
+                <span class="dot">•</span>
+                <span class="account-name">{{ tx.accountName }}</span>
+              </ng-template>
             </div>
           </div>
 
           <div class="tx-amount" [ngClass]="tx.type">
             <span class="symbol">{{ tx.type === 'GASTO' ? '-' : '+' }}</span>
             {{ tx.amount | currency:'PEN':'symbol':'1.2-2' }}
+          </div>
+
+          <div class="tx-actions">
+            <button class="icon-btn edit" (click)="editTransaction(tx)" title="Editar">
+              <span class="material-symbols-rounded">edit</span>
+            </button>
+            <button class="icon-btn delete" (click)="deleteTransaction(tx.id)" title="Eliminar">
+              <span class="material-symbols-rounded">delete</span>
+            </button>
           </div>
 
         </div>

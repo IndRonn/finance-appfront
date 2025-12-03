@@ -1,29 +1,22 @@
 <header class="header-container">
 
   <div class="header-title-box">
-    <span class="overline">VISIÓN GENERAL</span>
-    <h1>Dashboard</h1>
+    <span class="overline">{{ uiState.pageSubtitle() }}</span>
+    <h1>{{ uiState.pageTitle() }}</h1>
   </div>
 
   <div class="header-actions">
 
     <button class="btn-primary" (click)="openNewTransaction()">
       <span class="material-symbols-rounded">add</span>
-      Nuevo Gasto
-    </button>
+      <span class="btn-text">Nuevo Gasto</span> </button>
 
     <div class="icon-group">
-      <button class="icon-btn"
-              (click)="uiState.togglePrivacy()"
-              [title]="uiState.isPrivacyMode() ? 'Mostrar montos' : 'Ocultar montos'">
+      <button class="icon-btn" (click)="uiState.togglePrivacy()"
+              [title]="uiState.isPrivacyMode() ? 'Mostrar' : 'Ocultar'">
         <span class="material-symbols-rounded">
           {{ uiState.isPrivacyMode() ? 'visibility' : 'visibility_off' }}
         </span>
-      </button>
-
-      <button class="icon-btn" (click)="toggleNotifications()">
-        <span class="material-symbols-rounded">notifications</span>
-        <span *ngIf="hasNotifications()" class="badge-dot"></span>
       </button>
     </div>
 
@@ -31,11 +24,11 @@
 
     <div class="user-profile">
       <div class="user-info">
-        <span class="name">{{ currentUser().name }}</span>
-        <span class="role">{{ currentUser().role }}</span>
+        <span class="name">{{ userName }}</span>
+        <span class="role">Propietario</span>
       </div>
       <div class="avatar">
-        {{ currentUser().initials }}
+        {{ userInitials }}
       </div>
     </div>
 

@@ -1,0 +1,44 @@
+<div class="bill-card" [ngClass]="statusClass">
+
+  <div class="card-left-border"></div>
+
+  <div class="card-content">
+
+    <div class="bill-header">
+      <div class="company-info">
+        <span class="company">{{ bill.company || 'SERVICIO' }}</span>
+        <h3 class="name">{{ bill.name }}</h3>
+      </div>
+      <span class="status-badge" [ngClass]="statusClass">{{ statusLabel }}</span>
+    </div>
+
+    <div class="bill-meta">
+      <div class="code-box" (click)="copyServiceCode($event)" title="Copiar Suministro">
+        <span class="label">SUMINISTRO</span>
+        <span class="code">{{ bill.serviceCode || '---' }} <span class="material-symbols-rounded copy-icon">content_copy</span></span>
+      </div>
+      <span class="category">{{ bill.categoryName }}</span>
+    </div>
+
+    <div class="bill-footer">
+      <div class="amount">
+        {{ bill.amount | currency:bill.currency:'symbol':'1.2-2' }}
+      </div>
+
+      <div class="actions">
+
+        <button *ngIf="bill.status === 'PAGADO'" class="btn-icon clone" (click)="clone.emit(bill)" title="Generar Nuevo Mes">
+          <span class="material-symbols-rounded">content_copy</span>
+        </button>
+
+        <button *ngIf="bill.status !== 'PAGADO'" class="btn-pay" (click)="pay.emit(bill)">
+          <span class="material-symbols-rounded">payments</span> Pagar
+        </button>
+
+        <button class="btn-icon" (click)="edit.emit(bill)"><span class="material-symbols-rounded">edit</span></button>
+        <button class="btn-icon delete" (click)="delete.emit(bill.id)"><span class="material-symbols-rounded">delete</span></button>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -6,6 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 // Services & Models
 import { BudgetService } from './services/budget.service';
 import { CategoryStateService } from '@core/services/category-state.service';
+import { AccountService } from '@features/accounts/services/account.service'; // <--- NUEVO
 import { BudgetResponse, BudgetRequest } from '@core/models/budget.model';
 import { CategoryResponse } from '@core/models/category.model';
 import { TransactionType } from '@core/models/enums.model';
@@ -25,23 +26,19 @@ import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
 export class BudgetsComponent implements OnInit {
   private budgetService = inject(BudgetService);
   private categoryService = inject(CategoryStateService);
+  private accountService = inject(AccountService); // <--- Inyectar
   private fb = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
 
-  // Datos
   budgets = signal<BudgetResponse[]>([]);
   categories = signal<CategoryResponse[]>([]);
-
-  // UI State
   isLoading = signal(true);
   currentDate = signal(new Date());
 
-  // Modal State
   isModalOpen = signal(false);
   isSubmitting = signal(false);
-  editingId = signal<number | null>(null); // <--- FALTABA ESTO (Control de Edición)
+  editingId = signal<number | null>(null);
 
-  // Formulario
   budgetForm = this.fb.group({
     categoryId: [null as number | null, [Validators.required]],
     limitAmount: [null as number | null, [Validators.required, Validators.min(1)]]
@@ -50,10 +47,21 @@ export class BudgetsComponent implements OnInit {
   ngOnInit() {
     this.loadBudgets();
     this.loadCategories();
+    this.setupAutoRefresh(); // <--- Activar escucha
+  }
+
+  // --- ESCUCHA DE EVENTOS GLOBALES ---
+  private setupAutoRefresh() {
+    // Si ocurre un gasto, el AccountService avisa.
+    // Como un gasto afecta el presupuesto, recargamos aquí también.
+    this.accountService.refreshNeeded$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.loadBudgets();
+      });
   }
 
   loadCategories() {
-    // Solo necesitamos categorías de GASTO
     this.categoryService.categories$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(cats => {
@@ -63,9 +71,10 @@ export class BudgetsComponent implements OnInit {
   }
 
   loadBudgets() {
-    this.isLoading.set(true);
+    // Opcional: No poner isLoading(true) si es refresh silencioso
+    // this.isLoading.set(true);
     const date = this.currentDate();
-    const month = date.getMonth() + 1; // API espera 1-12
+    const month = date.getMonth() + 1;
     const year = date.getFullYear();
 
     this.budgetService.getBudgets(month, year).subscribe({
@@ -77,41 +86,30 @@ export class BudgetsComponent implements OnInit {
     });
   }
 
-  // --- ACTIONS CRUD ---
+  // ... (El resto de métodos openCreateModal, openEditModal, onSubmit, deleteBudget, closeModal, changeMonth se mantienen IGUAL que en tu código anterior) ...
+  // Solo asegúrate de copiarlos aquí abajo.
 
-  // 1. ABRIR PARA CREAR
   openCreateModal() {
-    this.editingId.set(null); // Modo Crear
+    this.editingId.set(null);
     this.budgetForm.reset();
-    this.budgetForm.get('categoryId')?.enable(); // Aseguramos que el select funcione
+    this.budgetForm.get('categoryId')?.enable();
     this.isModalOpen.set(true);
   }
 
-  // 2. ABRIR PARA EDITAR (Faltaba este método)
   openEditModal(budget: BudgetResponse) {
     this.editingId.set(budget.id);
-
-    // Buscamos el ID de la categoría basado en el nombre (si el backend no manda ID directo en el response)
     const matchingCategory = this.categories().find(c => c.name === budget.categoryName);
-
     this.budgetForm.patchValue({
       limitAmount: budget.limitAmount,
       categoryId: matchingCategory ? matchingCategory.id : null
     });
-
-    // UX: Bloqueamos cambiar categoría al editar, mejor borrar y crear de nuevo si te equivocaste de rubro
     this.budgetForm.get('categoryId')?.disable();
-
     this.isModalOpen.set(true);
   }
 
-  // 3. GUARDAR (CREATE / UPDATE)
   onSubmit() {
     if (this.budgetForm.invalid) return;
-
     this.isSubmitting.set(true);
-
-    // Usamos getRawValue() para incluir categoryId aunque esté disabled
     const formVal = this.budgetForm.getRawValue();
     const date = this.currentDate();
 
@@ -123,39 +121,29 @@ export class BudgetsComponent implements OnInit {
     };
 
     if (this.editingId()) {
-      // UPDATE
       this.budgetService.updateBudget(this.editingId()!, request).subscribe({
         next: (updated) => {
-          // Actualizamos la lista local
           this.budgets.update(list => list.map(b => b.id === updated.id ? updated : b));
           this.closeModal();
         },
-        error: (err) => {
-          console.error(err);
-          this.isSubmitting.set(false);
-        }
+        error: () => this.isSubmitting.set(false)
       });
     } else {
-      // CREATE
       this.budgetService.createBudget(request).subscribe({
         next: (newBudget) => {
           this.budgets.update(list => [...list, newBudget]);
           this.closeModal();
         },
-        error: (err) => {
-          console.error(err);
-          this.isSubmitting.set(false);
-        }
+        error: () => this.isSubmitting.set(false)
       });
     }
   }
 
-  // 4. ELIMINAR
   deleteBudget(id: number) {
     if(!confirm('¿Eliminar este presupuesto?')) return;
-
-    this.budgetService.deleteBudget(id).subscribe(() => {
-      this.budgets.update(list => list.filter(b => b.id !== id));
+    this.budgetService.deleteBudget(id).subscribe({
+      next: () => this.budgets.update(list => list.filter(b => b.id !== id)),
+      error: (e) => console.error(e)
     });
   }
 
@@ -166,7 +154,6 @@ export class BudgetsComponent implements OnInit {
     this.budgetForm.reset();
   }
 
-  // NAVEGACIÓN FECHAS
   changeMonth(delta: number) {
     const newDate = new Date(this.currentDate());
     newDate.setMonth(newDate.getMonth() + delta);

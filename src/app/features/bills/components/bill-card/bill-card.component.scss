@@ -1,0 +1,80 @@
+.bill-card {
+  background-color: var(--color-bg-card);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-subtle);
+  transition: transform 0.2s;
+  border: 1px solid var(--color-border);
+  display: flex;
+
+  &:hover { transform: translateY(-3px); }
+
+  // ESTADOS DE BORDE
+  &.pending .card-left-border { background-color: #F59E0B; } // Amarillo
+  &.urgent .card-left-border { background-color: #F97316; }  // Naranja
+  &.overdue .card-left-border { background-color: #EF4444; } // Rojo
+  &.paid .card-left-border { background-color: #10B981; }    // Verde
+
+  // Si está pagado, bajamos la opacidad general para que no distraiga
+  &.paid { opacity: 0.8; }
+}
+
+.card-left-border { width: 6px; height: auto; }
+
+.card-content { flex: 1; padding: 1.2rem; display: flex; flex-direction: column; gap: 1rem; }
+
+.bill-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  .company { font-size: 0.7rem; text-transform: uppercase; color: var(--color-sidebar-text); letter-spacing: 1px; }
+  .name { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--color-text-heading); }
+
+  .status-badge {
+    font-size: 0.7rem; font-weight: 700; padding: 4px 8px; border-radius: 4px; text-transform: uppercase;
+    &.pending { background: #FFFBEB; color: #D97706; }
+    &.urgent { background: #FFF7ED; color: #C2410C; }
+    &.overdue { background: #FEF2F2; color: #DC2626; }
+    &.paid { background: #ECFDF5; color: #059669; }
+  }
+}
+
+.bill-meta {
+  display: flex; justify-content: space-between; align-items: center;
+
+  .code-box {
+    cursor: pointer;
+    .label { display: block; font-size: 0.6rem; color: var(--color-sidebar-text); }
+    .code {
+      font-family: 'Lato', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--color-text-body);
+      display: flex; align-items: center; gap: 4px;
+      &:hover { color: var(--color-primary); }
+    }
+    .copy-icon { font-size: 0.9rem; opacity: 0.5; }
+  }
+
+  .category { font-size: 0.8rem; background: rgba(0,0,0,0.05); padding: 2px 8px; border-radius: 10px; color: var(--color-text-body); }
+}
+
+.bill-footer {
+  display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border); padding-top: 1rem;
+
+  .amount { font-size: 1.4rem; font-weight: 700; color: var(--color-text-heading); }
+
+  .actions {
+    display: flex; gap: 0.5rem;
+
+    .btn-icon {
+      background: transparent; border: none; cursor: pointer; color: var(--color-sidebar-text); padding: 6px; border-radius: 50%;
+      &:hover { background: rgba(0,0,0,0.05); color: var(--color-text-heading); }
+      &.delete:hover { background: rgba(239,68,68,0.1); color: var(--color-danger); }
+      &.clone:hover { background: rgba(16,185,129,0.1); color: var(--color-primary); }
+    }
+
+    .btn-pay {
+      background: var(--color-text-heading); color: #fff; border: none; border-radius: 8px;
+      padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px;
+      &:hover { background: var(--color-primary); }
+      span { font-size: 1.1rem; }
+    }
+  }
+}

@@ -16,29 +16,82 @@
   <div *ngIf="status()" class="stats-grid">
 
     <div class="card hero-card">
+
       <div class="card-header">
         <span class="label">DISPONIBLE PARA HOY</span>
-        <div class="icon-circle">
-          <span class="material-symbols-rounded">account_balance_wallet</span>
-        </div>
       </div>
 
-      <div class="amount-wrapper" [class.privacy-blur]="uiState.isPrivacyMode()">
-        <h1 [style.color]="getAvailabilityColor(status()!.availableForToday)">
-          {{ status()!.availableForToday | currency:'PEN':'symbol':'1.2-2' }}
-        </h1>
+      <div class="main-row">
+
+        <div class="side-stat left">
+
+          <ng-container *ngIf="status()!.yesterdaySaved > 0">
+            <span class="stat-label text-success">¡Ahorraste!</span>
+            <span class="stat-value positive">
+              +{{ status()!.yesterdaySaved | slytherinCurrency:'PEN' }}
+            </span>
+          </ng-container>
+
+          <ng-container *ngIf="status()!.yesterdaySaved < 0">
+            <span class="stat-label text-danger">Exceso</span>
+            <span class="stat-value negative">
+              {{ status()!.yesterdaySaved | slytherinCurrency:'PEN' }}
+            </span>
+          </ng-container>
+
+          <ng-container *ngIf="status()!.yesterdaySaved === 0">
+            <span class="stat-label">Balance Ayer</span>
+            <span class="stat-value neutral">Exacto</span>
+          </ng-container>
+
+          <span class="sub-info">Gasto: {{ status()!.yesterdaySpent | slytherinCurrency:'PEN':'1.0-0' }}</span>
+        </div>
+
+        <div class="center-column">
+          <div class="amount-wrapper" [class.privacy-blur]="uiState.isPrivacyMode()">
+            <h1 [style.color]="getAvailabilityColor(status()!.availableForToday)">
+              {{ status()!.availableForToday | slytherinCurrency:'PEN' }}
+            </h1>
+          </div>
+
+          <div class="daily-progress-box" *ngIf="status()!.dailyLimit > 0">
+            <div class="progress-track">
+              <div class="progress-fill"
+                   [style.width.%]="dailyProgressPct"
+                   [style.background-color]="dailyProgressColor">
+              </div>
+            </div>
+            <span class="progress-context">
+              Gastado {{ status()!.spentToday | slytherinCurrency:'PEN' }}
+              <span class="divider">de</span>
+              {{ status()!.dailyLimit | slytherinCurrency:'PEN' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="side-stat right">
+          <span class="stat-label">PARA MAÑANA</span>
+          <div class="projection-box">
+            <span class="stat-value positive">
+              {{ status()!.projectedAvailableTomorrow | slytherinCurrency:'PEN' }}
+            </span>
+            <span class="boost-pill" *ngIf="boostAmount() > 0">
+              +{{ boostAmount() | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+
       </div>
 
       <div class="card-footer">
         <span class="info-text">
           Quedan <strong>{{ status()!.remainingDays }} días</strong> en el mes
         </span>
+        <button class="btn-ritual-mini" (click)="openRitual()">
+          <span class="material-symbols-rounded">gavel</span>
+          Cerrar
+        </button>
       </div>
-
-      <button class="btn-ritual" (click)="openRitual()">
-        <span class="material-symbols-rounded">gavel</span>
-        Cerrar Caja
-      </button>
     </div>
 
     <div class="card metric-card">
@@ -48,7 +101,7 @@
       <div class="metric-content">
         <span class="label">Límite Mensual</span>
         <span class="value" [class.privacy-blur]="uiState.isPrivacyMode()">
-          {{ status()!.totalMonthLimit | currency:'PEN':'symbol':'1.0-0' }}
+          {{ status()!.totalMonthLimit | slytherinCurrency:'PEN':'1.0-0' }}
         </span>
       </div>
     </div>
@@ -60,12 +113,72 @@
       <div class="metric-content">
         <span class="label">Gastado Mes</span>
         <span class="value" [class.privacy-blur]="uiState.isPrivacyMode()">
-          {{ status()!.totalMonthSpent | currency:'PEN':'symbol':'1.0-0' }}
+          {{ status()!.totalMonthSpent | slytherinCurrency:'PEN':'1.0-0' }}
         </span>
       </div>
     </div>
 
+    <div class="card metric-card clickable" routerLink="/bills">
+
+      <ng-container *ngIf="urgentBills().length > 0; else allGood">
+        <div class="icon-box orange">
+          <span class="material-symbols-rounded">notifications_active</span>
+        </div>
+        <div class="metric-content">
+          <span class="label text-orange">Atención</span>
+          <span class="value warning-text">
+            {{ urgentBills().length }} Pendientes
+          </span>
+        </div>
+      </ng-container>
+
+      <ng-template #allGood>
+        <div class="icon-box green">
+          <span class="material-symbols-rounded">verified</span>
+        </div>
+        <div class="metric-content">
+          <span class="label">Vencimientos</span>
+          <span class="value small-text">Todo al día</span>
+        </div>
+      </ng-template>
+
+    </div>
+
+  </div> <div class="recent-activity-section" *ngIf="recentTransactions().length > 0">
+  <h3 class="section-title">Actividad Reciente</h3>
+
+  <div class="activity-list">
+    <div *ngFor="let tx of recentTransactions()" class="activity-item">
+
+      <div class="icon-wrapper" [ngClass]="tx.type">
+          <span class="material-symbols-rounded">
+            {{ tx.type === 'INGRESO' ? 'arrow_downward' : (tx.type === 'GASTO' ? 'arrow_upward' : 'sync_alt') }}
+          </span>
+      </div>
+
+      <div class="info">
+        <span class="desc">{{ tx.description }}</span>
+        <div class="tx-meta">
+          <ng-container *ngIf="tx.type === 'TRANSFERENCIA'; else standardMeta">
+                <span class="transfer-flow">
+                  {{ tx.accountName }} <span class="material-symbols-rounded arrow-icon">arrow_right_alt</span> {{ tx.destinationAccountName }}
+                </span>
+          </ng-container>
+          <ng-template #standardMeta>
+            <span>{{ tx.transactionDate | date:'d MMM' }} • {{ tx.categoryName || 'General' }}</span>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="amount" [class.privacy-blur]="uiState.isPrivacyMode()" [ngClass]="tx.type">
+        <span class="symbol">{{ tx.type === 'GASTO' ? '-' : '+' }}</span>
+        {{ tx.amount | slytherinCurrency:'PEN' }}
+      </div>
+
+    </div>
   </div>
+</div>
+
 </div>
 
 <app-daily-ritual

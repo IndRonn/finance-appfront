@@ -1,15 +1,19 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'; // <--- Importante
+
+// Services & Models
 import { TransactionService } from './services/transaction.service';
+import { AccountService } from '@features/accounts/services/account.service'; // <--- Importar
+import { ModalStateService } from '@core/services/modal-state.service'; // <--- Para editar
 import { Transaction } from '@core/models/transaction.model';
 import { TransactionType } from '@core/models/enums.model';
 
-// Interfaz auxiliar para la agrupación visual
 interface DailyGroup {
-  date: string; // "Hoy", "Ayer", o fecha completa
-  originalDate: Date; // Para ordenar
+  date: string;
+  originalDate: Date;
   transactions: Transaction[];
-  dailyTotal: number; // Opcional: ver cuánto se gastó ese día
+  dailyTotal: number;
 }
 
 @Component({
@@ -21,19 +25,32 @@ interface DailyGroup {
 })
 export class TransactionsComponent implements OnInit {
   private transactionService = inject(TransactionService);
+  private accountService = inject(AccountService); // <--- Inyectar
+  private modalState = inject(ModalStateService);  // <--- Inyectar
+  private destroyRef = inject(DestroyRef);
 
   isLoading = signal(true);
   groupedTransactions = signal<DailyGroup[]>([]);
-
-  // Exponer el Enum al HTML
   TransactionType = TransactionType;
 
   ngOnInit() {
     this.loadHistory();
+    this.setupAutoRefresh(); // <--- Activar escucha
+  }
+
+  // --- TIEMPO REAL ---
+  private setupAutoRefresh() {
+    this.accountService.refreshNeeded$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        // Si se crea un movimiento desde el Header, actualizamos la lista
+        this.loadHistory();
+      });
   }
 
   loadHistory() {
-    this.isLoading.set(true);
+    // Si es refresh automático, podrías evitar el spinner si quisieras
+    // this.isLoading.set(true);
     this.transactionService.getHistory().subscribe({
       next: (data) => {
         const groups = this.groupByDate(data);
@@ -47,15 +64,28 @@ export class TransactionsComponent implements OnInit {
     });
   }
 
-  // ALGORITMO DE AGRUPACIÓN (Magia Senior 🪄)
+  // --- ACCIONES CRUD ---
+
+  editTransaction(tx: Transaction) {
+    this.modalState.openEditTransaction(tx);
+  }
+
+  deleteTransaction(id: number) {
+    if(!confirm('¿Eliminar este movimiento? El saldo será restaurado.')) return;
+
+    this.transactionService.deleteTransaction(id).subscribe({
+      // No necesitamos llamar a loadHistory() aquí porque el servicio ya hace
+      // tap(() => notifyRefresh()), lo que dispara el setupAutoRefresh() de arriba.
+      error: (e) => console.error(e)
+    });
+  }
+
+  // --- HELPERS DE AGRUPACIÓN (Igual que antes) ---
   private groupByDate(transactions: Transaction[]): DailyGroup[] {
     const groups: { [key: string]: DailyGroup } = {};
 
-    // 1. Agrupar
     transactions.forEach(tx => {
-      // Usamos la fecha corta (YYYY-MM-DD) como clave
       const dateKey = tx.transactionDate.substring(0, 10);
-
       if (!groups[dateKey]) {
         groups[dateKey] = {
           date: dateKey,
@@ -65,36 +95,34 @@ export class TransactionsComponent implements OnInit {
         };
       }
       groups[dateKey].transactions.push(tx);
-
-      // Sumar al total del día si es gasto (negativo visualmente) o ingreso
       if (tx.type === TransactionType.GASTO) groups[dateKey].dailyTotal -= tx.amount;
       if (tx.type === TransactionType.INGRESO) groups[dateKey].dailyTotal += tx.amount;
     });
 
-    // 2. Convertir a Array y Ordenar (Más reciente primero)
     return Object.values(groups)
       .sort((a, b) => b.originalDate.getTime() - a.originalDate.getTime())
       .map(group => ({
         ...group,
-        date: this.getRelativeLabel(group.originalDate) // "Hoy", "Ayer", etc.
+        date: this.getRelativeLabel(group.originalDate)
       }));
   }
 
-  // Helper para etiquetas humanas
   private getRelativeLabel(date: Date): string {
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
 
-    // Normalizar a medianoche para comparar solo fechas
-    const d = new Date(date.toDateString());
-    const t = new Date(today.toDateString());
-    const y = new Date(yesterday.toDateString());
+    // Ajuste de zona horaria simple para comparar fechas locales
+    const dStr = date.toISOString().split('T')[0];
+    const tStr = today.toISOString().split('T')[0];
+    const yStr = yesterday.toISOString().split('T')[0];
 
-    if (d.getTime() === t.getTime()) return 'Hoy';
-    if (d.getTime() === y.getTime()) return 'Ayer';
+    if (dStr === tStr) return 'Hoy';
+    if (dStr === yStr) return 'Ayer';
 
-    // Formato elegante: "Jueves, 24 de Nov"
-    return d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' });
+    // Como date viene de "YYYY-MM-DD" y new Date() asume UTC a veces,
+    // usamos la fecha con la parte de tiempo T00:00 para formatear seguro
+    const localDate = new Date(dStr + 'T00:00:00');
+    return localDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' });
   }
 }

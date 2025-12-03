@@ -4,11 +4,13 @@ import { Injectable, signal, effect } from '@angular/core';
   providedIn: 'root'
 })
 export class UiStateService {
-  // Signal para el Modo Privacidad
   readonly isPrivacyMode = signal<boolean>(localStorage.getItem('privacy_mode') === 'true');
-
-  // 👇 AGREGAMOS ESTO (La propiedad que faltaba)
   readonly currentDate = new Date();
+
+  // 👇 NUEVO: Título dinámico de la página
+  readonly pageTitle = signal<string>('Dashboard');
+  // 👇 NUEVO: Subtítulo opcional (ej: "Visión General")
+  readonly pageSubtitle = signal<string>('Visión General');
 
   constructor() {
     effect(() => {
@@ -18,5 +20,11 @@ export class UiStateService {
 
   togglePrivacy(): void {
     this.isPrivacyMode.update(v => !v);
+  }
+
+  // Método para que las páginas actualicen el header al entrar
+  setPageTitle(title: string, subtitle: string = 'Gestión') {
+    this.pageTitle.set(title);
+    this.pageSubtitle.set(subtitle);
   }
 }

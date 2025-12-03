@@ -10,13 +10,13 @@
       <span class="card-type-badge">CRÉDITO</span>
 
       <div class="action-buttons">
-        <button class="icon-btn edit" (click)="edit.emit(account)" title="Editar">
+        <button class="icon-btn edit" (click)="$event.stopPropagation(); edit.emit(account)" title="Editar">
           <span class="material-symbols-rounded">edit</span>
         </button>
 
         <button class="icon-btn delete"
                 [class.confirming]="isConfirmingDelete()"
-                (click)="handleDelete()"
+                (click)="$event.stopPropagation(); handleDelete()"
                 [title]="isConfirmingDelete() ? '¿Confirmar?' : 'Eliminar'">
           <span class="material-symbols-rounded">
             {{ isConfirmingDelete() ? 'check_circle' : 'delete' }}
@@ -42,8 +42,8 @@
   <div class="limit-section">
     <div class="limit-info">
       <div class="info-group">
-        <span class="label">Deuda</span>
-        <span class="val">{{ debtAmount | number:'1.2-2' }}</span>
+        <span class="label">Deuda Total</span>
+        <span class="val">{{ debtTotal | number:'1.2-2' }}</span>
         <span class="pct-badge" style="color: var(--color-primary)">
           {{ usagePercentage | number:'1.0-0' }}%
         </span>
@@ -53,29 +53,36 @@
         <span class="val">{{ totalLimit | number:'1.0-0' }}</span>
       </div>
     </div>
+
     <div class="progress-track">
       <div class="progress-fill" [style.width.%]="usagePercentage"></div>
     </div>
   </div>
 
   <div class="card-footer">
+
     <div class="date-box">
       <div class="icon-circle">
-        <span class="material-symbols-rounded">date_range</span>
+        <span class="material-symbols-rounded">timelapse</span>
       </div>
       <div class="date-text">
-        <span class="d-label">Periodo Actual</span>
-        <span class="d-value period">{{ periodRange }}</span>
+        <span class="d-label">Ciclo Actual</span>
+        <span class="d-value">{{ currentCycle | currency:(account.currency === 'PEN' ? 'S/' : '$'):'symbol':'1.2-2' }}</span>
+        <span class="d-period">{{ periodRange }}</span>
       </div>
     </div>
+
     <div class="divider"></div>
+
     <div class="date-box highlight">
       <div class="icon-circle">
-        <span class="material-symbols-rounded">savings</span>
+        <span class="material-symbols-rounded">notifications_active</span>
       </div>
       <div class="date-text">
-        <span class="d-label">Pagar el</span>
-        <span class="d-value">{{ nextPaymentDisplay }}</span>
+        <span class="d-label">Pagar el {{ nextPaymentDisplay }}</span>
+        <span class="d-value payment-amount">
+          {{ statementAmount | currency:(account.currency === 'PEN' ? 'S/' : '$'):'symbol':'1.2-2' }}
+        </span>
       </div>
     </div>
   </div>

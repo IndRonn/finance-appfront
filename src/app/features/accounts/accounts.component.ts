@@ -7,6 +7,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AccountService } from './services/account.service';
 import { Account, CreateAccountRequest } from '@core/models/account.model';
 import { AccountType, Currency } from '@core/models/enums.model';
+import { UiStateService } from '@core/services/ui-state.service';
 
 // Components
 import { AccountCardComponent } from './components/account-card/account-card.component';
@@ -30,12 +31,12 @@ export class AccountsComponent implements OnInit {
   private accountService = inject(AccountService);
   private fb = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
+  public uiState = inject(UiStateService);
 
-  // --- ESTADO PRINCIPAL ---
+  // Estados
   accounts = signal<Account[]>([]);
   isLoading = signal(true);
 
-  // Filtros Computados (Separan las listas visualmente)
   debitAccounts = computed(() =>
     this.accounts().filter(a => a.type === AccountType.DEBITO || a.type === AccountType.EFECTIVO)
   );
@@ -44,46 +45,48 @@ export class AccountsComponent implements OnInit {
     this.accounts().filter(a => a.type === AccountType.CREDITO)
   );
 
-  // --- ESTADO DEL MODAL ---
   isModalOpen = signal(false);
   isSubmitting = signal(false);
-  editingAccountId = signal<number | null>(null); // null = Modo Crear, number = Modo Editar
+  editingAccountId = signal<number | null>(null);
 
-  // --- FORMULARIO REACTIVO ---
+  // --- FORMULARIO ACTUALIZADO ---
   accountForm = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(50)]],
     bankName: [''],
     type: [AccountType.DEBITO, [Validators.required]],
     currency: [Currency.PEN, [Validators.required]],
-    initialBalance: [0, [Validators.required, Validators.min(0)]],
-    // Campos opcionales (Solo Crédito)
+
+    // Saldo Genérico (Débito/Efectivo)
+    initialBalance: [0, [Validators.min(0)]],
+
+    // Campos TC
     closingDate: [null as number | null],
     paymentDate: [null as number | null],
-    creditLimit: [0]
+    creditLimit: [0],
+
+    // 👇 NUEVOS CAMPOS (Desglose TC)
+    previousBalance: [0, [Validators.min(0)]], // Facturado
+    currentBalance: [0, [Validators.min(0)]]   // Consumo actual
   });
 
-  // Helpers para el HTML
   eAccountType = Object.values(AccountType);
   eCurrency = Object.values(Currency);
   daysOfMonth = Array.from({length: 31}, (_, i) => i + 1);
 
   ngOnInit() {
+    this.uiState.setPageTitle('Billetera', 'Activos y Pasivos');
     this.loadAccounts();
-    this.setupTypeChanges(); // Activa la escucha de cambios de tipo
+    this.setupTypeChanges();
     this.setupAutoRefresh();
   }
 
   private setupAutoRefresh() {
     this.accountService.refreshNeeded$
-      .pipe(takeUntilDestroyed(this.destroyRef)) // Importante: Limpia suscripción al destruir componente
-      .subscribe(() => {
-        // Cuando suene la alarma, recargamos los datos silenciosamente
-        this.loadAccounts();
-      });
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.loadAccounts());
   }
 
   loadAccounts() {
-    this.isLoading.set(true);
     this.accountService.getMyAccounts().subscribe({
       next: (data) => {
         this.accounts.set(data);
@@ -93,149 +96,147 @@ export class AccountsComponent implements OnInit {
     });
   }
 
-  // --- LÓGICA DE FORMULARIO DINÁMICO ---
   private setupTypeChanges() {
     this.accountForm.get('type')?.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((type) => this.updateValidators(type as AccountType));
   }
 
+  // --- VALIDACIÓN DINÁMICA ---
   private updateValidators(type: AccountType) {
     const limitControl = this.accountForm.get('creditLimit');
     const closingControl = this.accountForm.get('closingDate');
     const paymentControl = this.accountForm.get('paymentDate');
+    const initialControl = this.accountForm.get('initialBalance');
+    const prevControl = this.accountForm.get('previousBalance');
+    const currControl = this.accountForm.get('currentBalance');
 
     if (type === AccountType.CREDITO) {
-      // Activar validaciones para tarjeta de crédito
+      // CASO CRÉDITO:
+      // 1. Requiere configuración de tarjeta (Límite y Fechas)
       limitControl?.setValidators([Validators.required, Validators.min(1)]);
       closingControl?.setValidators([Validators.required]);
       paymentControl?.setValidators([Validators.required]);
+
+      // 2. El saldo inicial genérico ya no es el foco principal, usamos el desglose
+      // Quitamos required a initialBalance porque usaremos previous/current
+      initialControl?.clearValidators();
+
     } else {
-      // Limpiar validaciones para débito/efectivo
-      limitControl?.clearValidators();
-      limitControl?.setValue(0);
+      // CASO DÉBITO/EFECTIVO:
+      // 1. Limpiamos campos de tarjeta
+      limitControl?.clearValidators(); limitControl?.setValue(0);
+      closingControl?.clearValidators(); closingControl?.setValue(null);
+      paymentControl?.clearValidators(); paymentControl?.setValue(null);
 
-      closingControl?.clearValidators();
-      closingControl?.setValue(null);
+      // 2. Limpiamos desglose
+      prevControl?.setValue(0);
+      currControl?.setValue(0);
 
-      paymentControl?.clearValidators();
-      paymentControl?.setValue(null);
+      // 3. Saldo inicial es obligatorio
+      initialControl?.setValidators([Validators.required, Validators.min(0)]);
     }
 
-    // Refrescar estado de los inputs
+    // Refrescar estados
     limitControl?.updateValueAndValidity();
     closingControl?.updateValueAndValidity();
     paymentControl?.updateValueAndValidity();
-    this.accountService.notifyRefresh();
+    initialControl?.updateValueAndValidity();
   }
 
-  // --- ACCIONES DEL USUARIO (CRUD) ---
+  // --- ACTIONS ---
 
-  // 1. ABRIR PARA CREAR
   openCreateModal() {
-    this.editingAccountId.set(null); // Modo Crear
+    this.editingAccountId.set(null);
     this.accountForm.reset({
       type: AccountType.DEBITO,
       currency: Currency.PEN,
       initialBalance: 0,
-      creditLimit: 0
+      creditLimit: 0,
+      previousBalance: 0,
+      currentBalance: 0
     });
-    // Forzamos validación inicial correcta (limpia campos de crédito)
     this.updateValidators(AccountType.DEBITO);
     this.isModalOpen.set(true);
   }
 
-  // 2. ABRIR PARA EDITAR
   openEditModal(account: Account) {
-    this.editingAccountId.set(account.id); // Modo Editar
+    this.editingAccountId.set(account.id);
 
     this.accountForm.patchValue({
       name: account.name,
       bankName: account.bankName,
       type: account.type,
       currency: account.currency,
-      initialBalance: account.initialBalance,
+      initialBalance: account.initialBalance, // En edición, mostramos el total
       creditLimit: account.creditLimit || 0,
       closingDate: account.closingDate || null,
-      paymentDate: account.paymentDate || null
+      paymentDate: account.paymentDate || null,
+      // En edición no solemos desglosar lo histórico, se asume 0 para no alterar si no se toca
+      previousBalance: 0,
+      currentBalance: 0
     });
 
-    // Ajustamos validadores según el tipo que viene de la BD
     this.updateValidators(account.type);
-
     this.isModalOpen.set(true);
   }
 
-  // 3. GUARDAR (CREATE / UPDATE)
   onSubmit() {
     if (this.accountForm.invalid) {
-      this.accountForm.markAllAsTouched(); // Muestra errores en rojo
+      this.accountForm.markAllAsTouched();
       return;
     }
 
     this.isSubmitting.set(true);
-    const formValue = this.accountForm.value;
-    const isCredit = formValue.type === AccountType.CREDITO;
+    const formVal = this.accountForm.value;
+    const isCredit = formVal.type === AccountType.CREDITO;
 
-    // CONSTRUCCIÓN SEGURA DEL REQUEST
-    // Solo enviamos datos de crédito si el tipo es CRÉDITO.
-    // Si es débito, enviamos undefined para que el backend reciba null o lo ignore.
+    // CONSTRUCCIÓN DEL REQUEST
     const request: CreateAccountRequest = {
-      name: formValue.name!,
-      bankName: formValue.bankName || undefined,
-      type: formValue.type!,
-      currency: formValue.currency!,
-      initialBalance: formValue.initialBalance!,
+      name: formVal.name!,
+      bankName: formVal.bankName || undefined,
+      type: formVal.type!,
+      currency: formVal.currency!,
 
-      creditLimit: isCredit ? formValue.creditLimit! : undefined,
-      closingDate: isCredit ? formValue.closingDate! : undefined,
-      paymentDate: isCredit ? formValue.paymentDate! : undefined
+      // Si es Crédito, initialBalance es 0 (el backend suma el desglose)
+      // O si es edición, se manda el valor calculado.
+      // Para simplificar: Si es creación y es crédito, mandamos 0 en initial y usamos el desglose.
+      initialBalance: isCredit ? 0 : (formVal.initialBalance || 0),
+
+      creditLimit: isCredit ? formVal.creditLimit! : undefined,
+      closingDate: isCredit ? formVal.closingDate! : undefined,
+      paymentDate: isCredit ? formVal.paymentDate! : undefined,
+
+      // Enviamos el desglose solo si es Crédito
+      previousBalance: isCredit ? (formVal.previousBalance || 0) : undefined,
+      currentBalance: isCredit ? (formVal.currentBalance || 0) : undefined
     };
 
     const currentId = this.editingAccountId();
 
     if (currentId) {
-      // --- ACTUALIZAR ---
       this.accountService.updateAccount(currentId, request).subscribe({
         next: (updatedAccount) => {
-          // Actualizamos la lista localmente (sin recargar página)
-          this.accounts.update(list =>
-            list.map(acc => acc.id === currentId ? updatedAccount : acc)
-          );
+          this.accounts.update(list => list.map(acc => acc.id === currentId ? updatedAccount : acc));
           this.closeModal();
         },
-        error: (err) => {
-          console.error('Error actualizando', err);
-          this.isSubmitting.set(false);
-        }
+        error: (err) => { console.error(err); this.isSubmitting.set(false); }
       });
     } else {
-      // --- CREAR ---
       this.accountService.createAccount(request).subscribe({
         next: (newAccount) => {
-          // Agregamos la nueva cuenta a la lista
           this.accounts.update(list => [...list, newAccount]);
           this.closeModal();
         },
-        error: (err) => {
-          console.error('Error creando', err);
-          this.isSubmitting.set(false);
-        }
+        error: (err) => { console.error(err); this.isSubmitting.set(false); }
       });
     }
   }
 
-  // 4. ELIMINAR
   deleteAccount(id: number) {
-    // Nota: El botón de la tarjeta ya hace una pre-confirmación visual ("seguro?").
-    // Aquí ejecutamos el borrado real.
-
     this.accountService.deleteAccount(id).subscribe({
-      next: () => {
-        // Filtramos la lista para quitar el eliminado
-        this.accounts.update(list => list.filter(a => a.id !== id));
-      },
-      error: (err) => console.error('Error eliminando', err)
+      next: () => this.accounts.update(list => list.filter(a => a.id !== id)),
+      error: (err) => console.error(err)
     });
   }
 
@@ -245,7 +246,6 @@ export class AccountsComponent implements OnInit {
     this.editingAccountId.set(null);
   }
 
-  // Helper para el HTML (ngIf)
   get isCreditCard(): boolean {
     return this.accountForm.get('type')?.value === AccountType.CREDITO;
   }

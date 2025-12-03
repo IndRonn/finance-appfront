@@ -1,6 +1,6 @@
 .credit-card-container {
   width: 100%;
-  min-height: 240px;
+  min-height: 250px; // Un poquito más alta para acomodar los datos extra
   border-radius: 20px;
   padding: 1.5rem;
   color: #fff;
@@ -16,201 +16,44 @@
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    .action-buttons { opacity: 1; transform: translateY(0); }
   }
 }
 
-// HEADER
+// --- HEADER ---
 .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-
-  .bank-name {
-    display: block;
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 1.1rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .header-actions-group {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.5rem;
-  }
-
-  .card-tier {
-    display: block;
-    font-size: 0.6rem;
-    opacity: 0.7;
-    letter-spacing: 2px;
-  }
-
-  .card-type-badge {
-    background: rgba(255,255,255,0.15);
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-  }
-
-  .action-buttons {
-    display: flex;
-    gap: 0.5rem;
-    opacity: 0; // Ocultos por defecto
-    transform: translateY(-5px);
-    transition: all 0.3s ease;
+  display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 5;
+  .bank-name { display: block; font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase; }
+  .header-actions-group { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; position: relative; z-index: 10; }
+  .card-tier { display: block; font-size: 0.6rem; opacity: 0.7; letter-spacing: 2px; }
+  .card-type-badge { background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; }
+  .action-buttons { display: flex; gap: 6px; opacity: 0; transform: translateY(-5px); transition: all 0.3s ease; }
+  .icon-btn { background: rgba(0,0,0,0.3); border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.8); cursor: pointer; transition: all 0.2s; position: relative; z-index: 20;
+    span { font-size: 1.1rem; pointer-events: none; }
+    &:hover { background: rgba(255,255,255,0.9); color: #000; }
+    &.delete:hover { background: rgba(239, 68, 68, 0.8); color: #fff; }
+    &.confirming { background: #EF4444 !important; color: #fff; animation: pulse 1s infinite; }
   }
 }
 
-.credit-card-container:hover .action-buttons {
-  opacity: 1;
-  transform: translateY(0);
-}
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 
-.icon-btn {
-  background: rgba(0,0,0,0.3);
-  border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255,255,255,0.7);
-  cursor: pointer;
-  transition: all 0.2s;
-
-  span { font-size: 1.1rem; }
-
-  &:hover {
-    background: rgba(255,255,255,0.2);
-    color: #fff;
-  }
-
-  &.delete:hover {
-    background: rgba(239, 68, 68, 0.3);
-    color: #ffcccc;
-  }
-
-  // ESTADO DE CONFIRMACIÓN (Rojo Intenso)
-  &.confirming {
-    background: #EF4444; // Rojo sólido
-    color: #fff;
-    transform: scale(1.1);
-    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
-    animation: pulse 1s infinite;
-  }
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-  70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-}
-
-// BODY
+// --- BODY ---
 .card-body {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 1.5rem 0;
-
-  .balance-wrapper {
-    .label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      opacity: 0.7;
-      letter-spacing: 1px;
-    }
-    .amount {
-      font-family: 'Lato', sans-serif;
-      font-size: 2.2rem;
-      font-weight: 300;
-
-      // CAMBIO: Moneda en Blanco Puro
-      .currency {
-        font-size: 1.2rem;
-        margin-right: 4px;
-        color: #FFFFFF;
-        opacity: 1;
-      }
-    }
-  }
-
-  .chip-sim {
-    width: 45px;
-    height: 34px;
-    background: linear-gradient(135deg, #dbe6ea 0%, #89969c 100%);
-    border-radius: 6px;
-    position: relative;
-    border: 1px solid rgba(0,0,0,0.2);
-
-    span {
-      position: absolute;
-      background: rgba(0,0,0,0.1);
-      &:nth-child(1) { top: 33%; width: 100%; height: 1px; }
-      &:nth-child(2) { top: 66%; width: 100%; height: 1px; }
-      &:nth-child(3) { left: 33%; top: 15%; width: 1px; height: 70%; }
-    }
-  }
+  display: flex; justify-content: space-between; align-items: center; margin: 1.5rem 0;
+  .balance-wrapper { .label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; letter-spacing: 1px; } .amount { font-family: 'Lato', sans-serif; font-size: 2.2rem; font-weight: 300; .currency { font-size: 1.2rem; margin-right: 4px; color: #FFFFFF; opacity: 1; } } }
+  .chip-sim { width: 45px; height: 34px; background: linear-gradient(135deg, #dbe6ea 0%, #89969c 100%); border-radius: 6px; position: relative; border: 1px solid rgba(0,0,0,0.2); span { position: absolute; background: rgba(0,0,0,0.1); &:nth-child(1) { top: 33%; width: 100%; height: 1px; } &:nth-child(2) { top: 66%; width: 100%; height: 1px; } &:nth-child(3) { left: 33%; top: 15%; width: 1px; height: 70%; } } }
 }
 
-// PROGRESS SECTION
+// --- PROGRESS SECTION ---
 .limit-section {
   margin-bottom: 1.5rem;
-
-  .limit-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    font-size: 0.85rem;
-    margin-bottom: 8px;
-
-    .info-group {
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
-    }
-
-    .label { opacity: 0.6; font-size: 0.75rem; text-transform: uppercase; }
-    .val { font-weight: 700; font-family: 'Lato', sans-serif; }
-
-    .pct-badge {
-      font-size: 0.75rem;
-      font-weight: 800;
-      background: rgba(0,0,0,0.3);
-      padding: 1px 5px;
-      border-radius: 4px;
-      margin-left: 4px;
-    }
-  }
-
-  .progress-track {
-    width: 100%;
-    height: 10px;
-    background-color: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    overflow: hidden;
-    margin-top: 8px;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 4px;
-      background-color: var(--color-primary); // Verde Slytherin
-      filter: brightness(1.3); // Brillo extra
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); // Neón
-      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-  }
+  .limit-info { display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.85rem; margin-bottom: 8px; .info-group { display: flex; align-items: baseline; gap: 6px; } .label { opacity: 0.6; font-size: 0.75rem; text-transform: uppercase; } .val { font-weight: 700; font-family: 'Lato', sans-serif; } .pct-badge { font-size: 0.75rem; font-weight: 800; background: rgba(0,0,0,0.3); padding: 1px 5px; border-radius: 4px; margin-left: 4px; } }
+  .progress-track { width: 100%; height: 10px; background-color: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); .progress-fill { height: 100%; border-radius: 4px; background-color: var(--color-primary); filter: brightness(1.3); box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); } }
 }
 
-// FOOTER
+
+// --- FOOTER ---
 .card-footer {
   background-color: rgba(0,0,0,0.2);
   margin: -1.5rem;
@@ -221,7 +64,7 @@
   justify-content: space-between;
   border-top: 1px solid rgba(255,255,255,0.1);
 
-  .divider { width: 1px; height: 25px; background-color: rgba(255,255,255,0.1); }
+  .divider { width: 1px; height: 40px; background-color: rgba(255,255,255,0.1); } // Divider más alto
 
   .date-box {
     display: flex;
@@ -230,12 +73,10 @@
 
     .icon-circle {
       background: rgba(255,255,255,0.05);
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       span { font-size: 1.2rem; opacity: 0.8; }
     }
 
@@ -243,14 +84,43 @@
       display: flex;
       flex-direction: column;
 
-      .d-label { font-size: 0.65rem; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.5px; }
-      .d-value { font-size: 0.9rem; font-weight: 700; text-transform: capitalize; }
-      .period { font-size: 0.85rem; letter-spacing: -0.3px; }
+      .d-label {
+        font-size: 0.6rem;
+        opacity: 0.6;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 2px;
+      }
+
+      .d-value {
+        font-size: 1rem; // Monto del ciclo actual un poco más grande
+        font-weight: 700;
+        font-family: 'Lato', sans-serif;
+      }
+
+      // Estilo para el rango de fechas debajo del monto
+      .d-period {
+        font-size: 0.7rem;
+        opacity: 0.5;
+        white-space: nowrap;
+        margin-top: 2px;
+      }
     }
 
     &.highlight {
-      .icon-circle { color: var(--color-primary); background: rgba(var(--color-primary-rgb), 0.15); }
-      .d-value { color: var(--color-primary); }
+      .icon-circle { color: #fff; background: var(--color-primary); box-shadow: 0 0 10px rgba(var(--color-primary-rgb), 0.4); }
+
+      .date-text {
+        .d-label { color: var(--color-primary); opacity: 1; }
+
+        .payment-amount {
+          color: #fff;
+          font-size: 1.1rem; // Monto a pagar destacado
+          font-weight: 800;
+          letter-spacing: 0.5px;
+          text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+      }
     }
   }
 }
