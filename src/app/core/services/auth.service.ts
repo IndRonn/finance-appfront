@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, Subject } from 'rxjs'; // <--- Importamos Subject
-import { environment } from '@env/environment';
+import { environment } from '../../../environments/environment';
 import { StorageService } from './storage.service';
 import { LoginRequest, AuthResponse, RegisterRequest, User } from '@core/models/auth.model';
 
@@ -25,6 +25,9 @@ export class AuthService {
   readonly currentUser = signal<User | null>(null);
 
   constructor() {
+
+    console.log('🚧 ENVIRONMENT ACTUAL:', environment);
+    console.log('🔗 API URL:', this.apiUrl);
     // Intentar restaurar usuario si hay token al recargar
     const token = this.storage.getToken();
     if (token) {
