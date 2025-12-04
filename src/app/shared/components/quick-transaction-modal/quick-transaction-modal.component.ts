@@ -8,6 +8,7 @@ import { ModalComponent } from '@shared/components/modal/modal.component';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
 import { FilterPipe } from '@shared/pipes/filter.pipe';
 import { DateUtils } from '@core/utils/date.utils';
+import { ChipsInputComponent } from '@shared/components/chips-input/chips-input.component';
 
 // Services
 import { TransactionService } from '@features/transactions/services/transaction.service';
@@ -24,7 +25,14 @@ import { Transaction, CreateTransactionRequest } from '@core/models/transaction.
 @Component({
   selector: 'app-quick-transaction-modal',
   standalone: true,
-  imports: [CommonModule, ModalComponent, ReactiveFormsModule, AutoFocusDirective, FilterPipe],
+  imports: [
+    CommonModule,
+    ModalComponent,
+    ReactiveFormsModule,
+    AutoFocusDirective,
+    FilterPipe,
+    ChipsInputComponent
+  ],
   templateUrl: './quick-transaction-modal.component.html',
   styleUrls: ['./quick-transaction-modal.component.scss']
 })
@@ -38,6 +46,7 @@ export class QuickTransactionModalComponent implements OnInit {
 
   @Input() isOpen: boolean = false;
   @Output() close = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<void>(); // Nuevo output para avisar al padre
 
   isSubmitting = signal(false);
 
@@ -59,9 +68,9 @@ export class QuickTransactionModalComponent implements OnInit {
     categoryId: [null as number | null],
     destinationAccountId: [null as number | null],
     exchangeRate: [1],
+    tagIds: [[] as number[]] // Array de IDs para las etiquetas
   });
 
-  // --- CORRECCIÓN AQUÍ ---
   constructor() {
     effect(() => {
       const txToEdit = this.modalState.editingTransaction();
@@ -69,10 +78,8 @@ export class QuickTransactionModalComponent implements OnInit {
       if (txToEdit) {
         this.loadTransactionData(txToEdit);
       } else {
-        // Solo reseteamos si estamos abriendo para crear (isOpen es true)
-        // y no hay transacción editando.
-        // Usamos un pequeño chequeo para no resetear innecesariamente si el modal está cerrado.
-        if (this.isOpen) {
+        // Solo reseteamos si estamos abriendo (isOpen true) y NO hay edición
+        if (this.isOpen && !txToEdit) {
           this.resetForm();
         }
       }
@@ -90,7 +97,7 @@ export class QuickTransactionModalComponent implements OnInit {
     });
     this.accountService.getMyAccounts().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(accounts => {
       this.accounts.set(accounts);
-      // Solo preseleccionar si NO estamos editando
+      // Preseleccionar cuenta por defecto solo si es nuevo
       if (!this.modalState.editingTransaction() && accounts.length > 0) {
         this.transactionForm.get('accountId')?.setValue(accounts[0].id);
         this.sourceAccountCurrency.set(accounts[0].currency);
@@ -99,42 +106,45 @@ export class QuickTransactionModalComponent implements OnInit {
   }
 
   loadTransactionData(tx: Transaction) {
-    console.log('⚡ Cargando datos al formulario:', tx); // Debug
-
-    // 1. Configurar tipo y validadores PRIMERO
+    // 1. Configurar tipo y validadores
     this.currentType.set(tx.type);
     this.updateConditionalValidators(tx.type);
 
-    // 2. Parchear valores
+    // 2. Extraer IDs de las etiquetas (El modelo tiene objetos Tag completas)
+    const tagIds = tx.tags ? tx.tags.map(t => t.id) : [];
+
+    // 3. Parchear valores al formulario
     this.transactionForm.patchValue({
       type: tx.type,
       amount: tx.amount,
       description: tx.description,
-      // Asegura que la fecha tenga el formato correcto para el input
       transactionDate: DateUtils.toLocalISOString(tx.transactionDate),
       accountId: tx.accountId,
       categoryId: tx.categoryId || null,
       destinationAccountId: tx.destinationAccountId || null,
-      exchangeRate: tx.exchangeRate || 1
+      exchangeRate: tx.exchangeRate || 1,
+      tagIds: tagIds // ✅ CORREGIDO: Mapeo de tags
     });
 
-    // 3. Actualizar moneda visual
+    // 4. Actualizar moneda visual
     const acc = this.accounts().find(a => a.id === tx.accountId);
     if(acc) this.sourceAccountCurrency.set(acc.currency);
   }
 
   resetForm() {
-    // Solo reseteamos si el modal se cerró o se pidió crear nuevo explícitamente
-    // Para evitar reseteos accidentales, verificamos si realmente necesitamos limpiar.
+    // Evitar reseteo si el form ya está limpio
     if (this.transactionForm.pristine && !this.transactionForm.get('amount')?.value) return;
 
     this.transactionForm.reset({
       type: TransactionType.GASTO,
       transactionDate: DateUtils.getCurrentLocalISOString(),
       amount: null,
-      exchangeRate: 1
+      description: '',
+      exchangeRate: 1,
+      tagIds: [] // ✅ IMPORTANTE: Limpiar tags
     });
 
+    // Restaurar defaults
     if (this.accounts().length > 0) {
       this.transactionForm.get('accountId')?.setValue(this.accounts()[0].id);
       this.sourceAccountCurrency.set(this.accounts()[0].currency);
@@ -192,6 +202,7 @@ export class QuickTransactionModalComponent implements OnInit {
       categoryId: formValue.categoryId || undefined,
       destinationAccountId: formValue.destinationAccountId || undefined,
       exchangeRate: formValue.exchangeRate || undefined,
+      tagIds: formValue.tagIds || [] // ✅ CORREGIDO: Enviar tags al backend
     };
 
     const editingTx = this.modalState.editingTransaction();
@@ -210,9 +221,10 @@ export class QuickTransactionModalComponent implements OnInit {
   }
 
   handleSuccess(msg: string) {
-    console.log(msg);
-    this.accountService.notifyRefresh();
+    // console.log(msg); // Opcional: mostrar toast
+    this.accountService.notifyRefresh(); // Actualizar saldos globales
     this.isSubmitting.set(false);
+    this.saved.emit(); // Avisar al componente padre
     this.closeModal();
   }
 
@@ -223,9 +235,10 @@ export class QuickTransactionModalComponent implements OnInit {
 
   getAccountDisplayLabel(account: Account): string {
     const symbol = account.currency === 'PEN' ? 'S/' : '$';
+    // Lógica visual para distinguir Débito de Crédito en el select
     if (account.type === 'CREDITO') {
       const limit = Number(account.creditLimit) || 0;
-      const debt = Number(account.initialBalance) || 0;
+      const debt = Number(account.initialBalance) || 0; // En TC, saldo suele ser deuda
       const available = Math.max(0, limit - debt);
       return `${account.name} — Disp: ${symbol}${available.toFixed(2)}`;
     } else {
@@ -235,9 +248,10 @@ export class QuickTransactionModalComponent implements OnInit {
 
   closeModal() {
     this.close.emit();
-    // Limpiamos el estado global
+    // Esperar a la animación de cierre antes de limpiar el estado global
     setTimeout(() => {
       this.modalState.closeTransactionModal();
+      this.resetForm(); // Limpieza final por seguridad
     }, 300);
   }
 }

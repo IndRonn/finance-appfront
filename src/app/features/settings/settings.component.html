@@ -1,0 +1,22 @@
+<div class="settings-container">
+
+  <nav class="settings-nav">
+    <a routerLink="categories"
+       routerLinkActive="active"
+       class="nav-item">
+      <span class="material-symbols-rounded">category</span>
+      <span>Categorías</span>
+    </a>
+
+    <a routerLink="tags"
+       routerLinkActive="active"
+       class="nav-item">
+      <span class="material-symbols-rounded">label</span>
+      <span>Etiquetas</span>
+    </a>
+  </nav>
+
+  <div class="settings-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

@@ -1,15 +1,13 @@
-<div class="categories-page">
+<div class="categories-sub-page">
 
-  <header class="page-header">
-    <div class="title-group">
-      <h1>Categorías</h1>
-      <p class="subtitle">Clasifica tus movimientos.</p>
-    </div>
+  <div class="page-toolbar">
+    <div class="toolbar-spacer"></div>
+
     <button class="btn-primary" (click)="openCreateModal()">
       <span class="material-symbols-rounded">add</span>
       Nueva
     </button>
-  </header>
+  </div>
 
   <div *ngIf="isLoading()" class="loading-state">
     <div class="spinner"></div>

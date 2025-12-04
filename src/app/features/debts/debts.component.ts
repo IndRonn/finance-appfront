@@ -16,6 +16,7 @@ import { TransactionType } from '@core/models/enums.model';
 import { DebtCardComponent } from './components/debt-card/debt-card.component';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
+import {UiStateService} from "@core/services/ui-state.service";
 
 @Component({
   selector: 'app-debts',
@@ -27,6 +28,7 @@ import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
 export class DebtsComponent implements OnInit {
   private debtService = inject(ExternalDebtService);
   private accountService = inject(AccountService);
+  private uiState = inject(UiStateService);
 
   // CORRECCIÓN: Renombramos la propiedad para que coincida con su uso
   private categoryStateService = inject(CategoryStateService);
@@ -64,6 +66,7 @@ export class DebtsComponent implements OnInit {
 
   ngOnInit() {
     this.loadData();
+    this.uiState.setPageTitle('Pasivos', 'Deudas Externas');
   }
 
   loadData() {

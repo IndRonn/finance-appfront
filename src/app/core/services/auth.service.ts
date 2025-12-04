@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router'; // <--- 1. Importar Router
-import { Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { Observable, tap, Subject } from 'rxjs'; // <--- Importamos Subject
 import { environment } from '@env/environment';
 import { StorageService } from './storage.service';
 import { LoginRequest, AuthResponse, RegisterRequest, User } from '@core/models/auth.model';
@@ -12,15 +12,20 @@ import { LoginRequest, AuthResponse, RegisterRequest, User } from '@core/models/
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly storage = inject(StorageService);
-  private readonly router = inject(Router); // <--- 2. Inyectar Router
+  private readonly router = inject(Router);
   private readonly apiUrl = `${environment.apiUrl}/auth`;
+
+  // 1. CANAL DE COMUNICACIÓN DE LOGOUT
+  // Usamos un Subject para notificar a otros servicios que deben limpiarse
+  private _logout$ = new Subject<void>();
+  public logout$ = this._logout$.asObservable();
 
   // Estado de autenticación
   readonly isAuthenticated = signal<boolean>(!!this.storage.getToken());
   readonly currentUser = signal<User | null>(null);
 
   constructor() {
-    // Intentar restaurar usuario si hay token
+    // Intentar restaurar usuario si hay token al recargar
     const token = this.storage.getToken();
     if (token) {
       this.decodeAndSetUser(token);
@@ -44,11 +49,15 @@ export class AuthService {
   }
 
   logout(): void {
+    // 1. Limpieza local de Auth
     this.storage.removeToken();
     this.isAuthenticated.set(false);
     this.currentUser.set(null);
 
-    // 👇 3. REDIRECCIÓN CENTRALIZADA
+    // 2. EMITIR LA SEÑAL DE LIMPIEZA A TODOS LOS SERVICIOS (Account, Category, etc.)
+    this._logout$.next();
+
+    // 3. Redirección centralizada
     this.router.navigate(['/auth/login']);
   }
 

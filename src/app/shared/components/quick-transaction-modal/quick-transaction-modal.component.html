@@ -26,19 +26,22 @@
                class="form-input amount-input"
                [appAutoFocus]="isOpen">
       </div>
-      <span class="error-text" *ngIf="transactionForm.get('amount')?.touched && transactionForm.get('amount')?.invalid">Monto requerido</span>
+      <span class="error-text" *ngIf="transactionForm.get('amount')?.touched && transactionForm.get('amount')?.invalid">
+        Monto requerido
+      </span>
     </div>
 
     <div class="form-group">
       <label>Cuenta de Origen</label>
       <select formControlName="accountId" class="form-select">
         <option [ngValue]="null" disabled>Selecciona la cuenta</option>
-
         <option *ngFor="let account of accounts()" [ngValue]="account.id">
           {{ getAccountDisplayLabel(account) }}
         </option>
       </select>
-      <span class="error-text" *ngIf="transactionForm.get('accountId')?.touched && transactionForm.get('accountId')?.invalid">Cuenta requerida</span>
+      <span class="error-text" *ngIf="transactionForm.get('accountId')?.touched && transactionForm.get('accountId')?.invalid">
+        Cuenta requerida
+      </span>
     </div>
 
     <div *ngIf="currentType() === TransactionType.GASTO || currentType() === TransactionType.INGRESO">
@@ -58,7 +61,6 @@
         <label>Cuenta de Destino</label>
         <select formControlName="destinationAccountId" class="form-select">
           <option [ngValue]="null" disabled>Selecciona destino</option>
-
           <option *ngFor="let account of accounts() | filter:transactionForm.get('accountId')?.value" [ngValue]="account.id">
             {{ getAccountDisplayLabel(account) }}
           </option>
@@ -67,8 +69,13 @@
     </div>
 
     <div class="form-group">
+      <label>Etiquetas</label>
+      <app-chips-input formControlName="tagIds"></app-chips-input>
+    </div>
+
+    <div class="form-group">
       <label>Descripción</label>
-      <input type="text" formControlName="description" class="form-input">
+      <input type="text" formControlName="description" class="form-input" placeholder="Ej: Cena con amigos">
     </div>
 
     <div class="form-group">

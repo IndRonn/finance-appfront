@@ -94,3 +94,42 @@ h1, h2, h3 {
     transform: translateY(-1px);
   }
 }
+
+.page-toolbar {
+  display: flex;
+  justify-content: flex-end; // A la derecha
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-top: 0.5rem;
+
+  &.with-nav {
+    justify-content: space-between; // Para presupuestos
+  }
+}
+
+// BOTÓN PRIMARIO DE PÁGINA (NEGRO)
+.page-toolbar .btn-primary {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  gap: 0.5rem;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-text-heading); // Negro
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Lato', sans-serif;
+
+  span { font-size: 1.2rem; }
+
+  &:hover {
+    background-color: var(--color-primary); // Verde
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+}

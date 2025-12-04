@@ -1,178 +1,152 @@
-// --- CONFIGURACIÓN BASE ---
-.sidebar-container {
-  width: 100%;
-  height: 100%;
-  background-color: var(--color-sidebar-bg); // #0F1112
-  display: flex;
-  flex-direction: column;
-  padding: 2rem 1.5rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.03);
+:host {
+  display: block;
+  height: 100vh;
+  /* Variables locales para facilitar ajustes */
+  --sb-bg: #0a0a0a;            // Casi negro
+  --sb-hover: rgba(255, 255, 255, 0.05);
+  --sb-active: rgba(26, 71, 42, 0.15); // Verde muy sutil
+  --sb-border: #1f1f1f;
+  --sb-text: #a0a0a0;
+  --sb-text-active: #e0e0e0;
 }
 
-// --- 1. BRAND ---
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--sb-bg);
+  border-right: 1px solid var(--sb-border);
+  padding: 1.5rem 1rem;
+  transition: width 0.3s ease;
+}
+
+// 1. BRAND (Logo)
 .brand {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 3.5rem;
-  padding-left: 0.5rem;
+  padding: 0 0.5rem 2rem 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--sb-border);
 
   .brand-logo {
     width: 36px;
     height: 36px;
-    background-color: var(--color-primary);
+    background: linear-gradient(135deg, #1A472A, #0f2e1b);
     color: #fff;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-family: 'Cinzel', serif;
     font-weight: 700;
     font-size: 1.2rem;
-    box-shadow: 0 4px 12px rgba(44, 95, 83, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(26, 71, 42, 0.4); // Glow verde
   }
 
   .brand-name {
     font-family: 'Cinzel', serif;
-    font-weight: 700;
     font-size: 1.1rem;
     color: #fff;
-    letter-spacing: 0.1em;
+    letter-spacing: 2px;
   }
 }
 
-// --- 2. MENU (CON ANIMACIÓN GOOGLE SYMBOLS) ---
+// 2. NAV MENU
 .nav-menu {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  flex: 1;
-}
+  flex: 1; // Ocupa todo el espacio disponible
+  overflow-y: auto; // Scroll si la pantalla es muy pequeña
 
-.nav-item {
-  display: flex;
-  align-items: center;
-  padding: 0.8rem 1rem;
-  border-radius: var(--border-radius-sm);
-  color: var(--color-sidebar-text);
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  width: 100%;
-  cursor: pointer;
-
-  // Transición suave para el fondo y color
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: 'Lato', sans-serif;
-  font-weight: 500;
-
-  .icon {
-    font-size: 1.4rem;
-    margin-right: 1rem;
-
-    // CONFIGURACIÓN DE ANIMACIÓN (Variable Fonts)
-    // Estado inicial: Delineado (FILL 0), Fino (wght 300)
-    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-
-    // Transición compleja para el efecto de "llenado"
-    transition: font-variation-settings 0.3s ease, color 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .label {
-    font-size: 0.95rem;
-    transition: transform 0.3s ease;
-  }
-
-  // --- ESTADO HOVER (La Magia) ---
-  &:hover {
-    background-color: var(--color-sidebar-hover);
-    color: #fff;
-    padding-left: 1.2rem; // Pequeño desplazamiento a la derecha
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: var(--sb-text);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent; // Indicador invisible
 
     .icon {
-      color: var(--color-primary); // Se pone verde
-
-      // Se rellena (FILL 1) y se pone un poco más grueso (wght 500)
-      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
-
-      // Pequeño salto (Pop)
-      transform: scale(1.1);
-    }
-  }
-
-  // --- ESTADO ACTIVO ---
-  &.active {
-    background-color: rgba(44, 95, 83, 0.15); // Fondo verde sutil
-    color: var(--color-sidebar-active);
-
-    // Indicador visual a la izquierda (opcional, si te gusta)
-    // border-left: 3px solid var(--color-primary);
-
-    .icon {
-      color: var(--color-primary);
-      // Mantenemos el icono relleno para indicar "estás aquí"
-      font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+      font-size: 1.3rem;
+      transition: color 0.2s;
     }
 
     .label {
-      font-weight: 700;
-      letter-spacing: 0.3px;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    // Hover State
+    &:hover {
+      background-color: var(--sb-hover);
+      color: #fff;
+    }
+
+    // Active State (Ruta actual)
+    &.active {
+      background-color: var(--sb-active);
+      color: var(--sb-text-active);
+      border-left-color: #1A472A; // Borde verde izquierdo
+
+      .icon {
+        color: #2E8B57; // Verde más brillante
+        font-variation-settings: 'FILL' 1; // Rellenar icono
+      }
     }
   }
 }
 
-// --- 3. WIDGET DE PATRIMONIO ---
+// 3. WIDGET PATRIMONIO (Wealth)
 .wealth-widget {
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(30, 30, 30, 0.6);
+  border: 1px solid var(--sb-border);
   border-radius: 12px;
   padding: 1rem;
   margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  backdrop-filter: blur(5px);
 
   .wealth-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 0.5rem;
     font-size: 0.85rem;
 
-    .w-label {
-      color: var(--color-sidebar-text);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    &:last-child { margin-bottom: 0; }
+
+    .w-label { color: #888; }
 
     .w-value {
-      font-family: 'Lato', sans-serif;
-      font-weight: 700;
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 600;
 
-      &.success { color: #10B981; }
-      &.danger { color: #EF4444; }
+      &.success { color: #2E8B57; text-shadow: 0 0 5px rgba(46, 139, 87, 0.2); }
+      &.danger { color: #8B0000; }
     }
   }
 }
 
-// --- 4. FOOTER / LOGOUT ---
+// 4. FOOTER (Logout)
 .sidebar-footer {
-  margin-top: auto;
-  padding-top: 0; // Ajustado porque el widget ya da espacio
-  border-top: none;
-}
+  border-top: 1px solid var(--sb-border);
+  padding-top: 1rem;
 
-.nav-item.logout {
-  color: var(--color-sidebar-text);
+  .logout {
+    width: 100%;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    justify-content: flex-start; // Alinear texto a la izquierda
 
-  &:hover {
-    background-color: rgba(211, 47, 47, 0.1);
-    color: var(--color-danger);
-
-    .icon {
-      color: var(--color-danger);
-      // Animación diferente para logout: solo se pone negrita, no se rellena (opcional)
-      font-variation-settings: 'wght' 600;
+    &:hover {
+      background: rgba(139, 0, 0, 0.1); // Rojo muy sutil al salir
+      color: #ff6b6b;
+      .icon { color: #ff6b6b; }
     }
   }
 }

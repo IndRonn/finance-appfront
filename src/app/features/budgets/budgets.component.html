@@ -1,26 +1,26 @@
 <div class="budgets-page">
 
   <header class="page-header">
-    <div class="header-content">
-      <h1>Presupuestos</h1>
+    <div class="page-toolbar with-nav">
 
       <div class="month-navigator">
         <button class="nav-btn" (click)="changeMonth(-1)">
           <span class="material-symbols-rounded">chevron_left</span>
         </button>
         <span class="current-month">
-          {{ currentDate() | date:'MMMM yyyy' | titlecase }}
-        </span>
+        {{ currentDate() | date:'MMMM yyyy' | titlecase }}
+      </span>
         <button class="nav-btn" (click)="changeMonth(1)">
           <span class="material-symbols-rounded">chevron_right</span>
         </button>
       </div>
+
+      <button class="btn-primary" (click)="openCreateModal()">
+        <span class="material-symbols-rounded">add</span>
+        Asignar
+      </button>
     </div>
 
-    <button class="btn-primary" (click)="openCreateModal()">
-      <span class="material-symbols-rounded">add</span>
-      Asignar
-    </button>
   </header>
 
   <div *ngIf="isLoading()" class="loading-state">

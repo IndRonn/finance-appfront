@@ -1,290 +1,274 @@
-// --- HEADER COMPACTO (Consistente con otras páginas) ---
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.5rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.8rem;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+:host { display: block; }
 
-  .title-group {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-
-    h1 {
-      font-size: 1.4rem;
-      margin: 0;
-      font-weight: 700;
-      color: var(--color-text-heading);
-      line-height: 1;
-    }
-
-    .subtitle {
-      font-size: 0.85rem;
-      color: var(--color-sidebar-text);
-      margin: 0;
-
-      // Separador visual
-      &::before { content: '|'; margin-right: 10px; opacity: 0.3; }
-
-      @media (max-width: 600px) { display: none; }
-    }
-  }
-}
-
-// --- LISTA DE TRANSACCIONES ---
-.transactions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem; // Separación entre días
+.transactions-page {
+  animation: fadeIn 0.4s ease-out;
   padding-bottom: 3rem;
 }
 
+.page-toolbar { margin-bottom: 1.5rem; }
+
+// --- LISTA GENERAL ---
+.transactions-list {
+  display: flex; flex-direction: column; gap: 1.5rem;
+}
+
+// --- GRUPO POR DÍA ---
 .day-group {
   animation: slideUp 0.3s ease-out;
 }
 
-// Cabecera del día ("Hoy", "Ayer")
+// Header Sticky ("Hoy", "Ayer")
 .day-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 0.5rem 0.5rem 0.5rem;
-  margin-bottom: 0.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.5rem 0.5rem;
+  margin-bottom: 0.8rem;
 
-  // Estilo de texto
-  color: var(--color-sidebar-text);
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  position: sticky; top: 0; z-index: 10;
+  background-color: var(--color-bg-main);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0.98;
 
-  // STICKY HEADER: Se pega arriba al scrollear
-  position: sticky;
-  top: 0;
-  background-color: var(--color-bg-main); // Necesario para tapar el contenido al pasar
-  z-index: 10;
-  opacity: 0.95;
-  backdrop-filter: blur(5px);
+  .date-label {
+    color: var(--color-gray-500);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
 
   .day-total {
     font-family: 'Lato', sans-serif;
-    opacity: 0.7;
     font-weight: 600;
+    font-size: 0.85rem;
+    opacity: 0.8;
 
-    &.positive {
-      color: var(--color-success);
-      opacity: 1;
-    }
+    &.text-success { color: var(--color-primary); }
+    &.text-danger { color: var(--color-danger); }
   }
 }
 
-// Tarjeta contenedora de items (Borde redondeado para el grupo)
+// Contenedor de items del día
 .transactions-card {
   background-color: var(--color-bg-card);
-  border-radius: 16px;
   border: 1px solid var(--color-border);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-subtle);
   overflow: hidden;
 }
 
-// --- ITEM INDIVIDUAL ---
-.transaction-item {
+// --- ITEM DE TRANSACCIÓN ---
+.txn-item {
   display: flex;
   align-items: center;
-  padding: 1rem 1.2rem;
-  border-bottom: 1px solid rgba(0,0,0,0.03); // Separador sutil
-  transition: background-color 0.2s;
-  cursor: default;
-  position: relative; // Para posicionar acciones
+
+  // 🔥 ESPACIO RESERVADO:
+  // 1rem (normal) + espacio extra a la derecha (6rem) para que los botones
+  // nunca se superpongan al texto/monto.
+  padding: 1.2rem 6rem 1.2rem 1rem;
+
+  border-bottom: 1px solid var(--color-border);
+  transition: all 0.2s ease;
+  position: relative; // Necesario para los botones absolutos
+  gap: 1rem;
 
   &:last-child { border-bottom: none; }
 
   &:hover {
-    background-color: rgba(0,0,0,0.015);
+    background-color: rgba(255,255,255,0.02);
 
-    // Al hacer hover en la fila, mostramos los botones
-    .tx-actions {
+    // Revelar acciones al hover
+    .txn-actions {
       opacity: 1;
+      transform: translateY(-50%) translateX(0);
       pointer-events: auto;
-      transform: translateX(0);
     }
   }
 
-  // 1. ICONO CIRCULAR
-  .tx-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 1rem;
+  // 1. ICONO
+  .txn-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
 
-    span { font-size: 1.2rem; }
+    &.INGRESO { background: rgba(44, 95, 83, 0.15); color: var(--color-primary); }
+    &.GASTO { background: rgba(211, 47, 47, 0.1); color: var(--color-danger); }
+    &.TRANSFERENCIA { background: rgba(255, 255, 255, 0.05); color: var(--color-gray-500); }
 
-    &.GASTO {
-      background-color: rgba(0,0,0,0.05);
-      color: var(--color-text-heading);
-    }
-    &.INGRESO {
-      background-color: rgba(16, 185, 129, 0.1);
-      color: var(--color-success);
-    }
-    &.TRANSFERENCIA {
-      background-color: rgba(59, 130, 246, 0.1);
-      color: #3B82F6;
-    }
+    span { font-size: 1.5rem; }
   }
 
-  // 2. DETALLES (Centro)
-  .tx-details {
+  // 2. DETALLES
+  .txn-details {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 6px;
     overflow: hidden;
-    min-width: 0; // Fix flexbox ellipsis
 
-    .tx-desc {
+    .desc {
+      font-family: 'Lato', sans-serif;
       font-weight: 600;
       color: var(--color-text-heading);
       font-size: 0.95rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      letter-spacing: 0.2px;
     }
 
-    .tx-meta {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.75rem;
-      color: var(--color-sidebar-text);
-      flex-wrap: wrap;
+    // Metadata
+    .meta-row {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 
-      .dot { font-weight: 900; opacity: 0.4; font-size: 0.6rem; }
-
-      .account-name {
-        background-color: rgba(0,0,0,0.03);
-        padding: 1px 6px;
-        border-radius: 4px;
-        font-weight: 600;
-        color: var(--color-text-body);
+      .meta-pill {
+        font-size: 0.7rem;
+        color: var(--color-sidebar-text);
+        background: rgba(255,255,255,0.04);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-weight: 500;
       }
 
-      // --- ESTILO DE TRANSFERENCIA (Visualización de Flujo) ---
       .transfer-flow {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        background-color: rgba(59, 130, 246, 0.08); // Azul muy suave
-        color: #2563EB; // Azul fuerte
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 0.75rem;
-        border: 1px solid rgba(59, 130, 246, 0.2);
+        display: flex; align-items: center; gap: 4px; font-size: 0.75rem; color: var(--color-gray-500);
+        .arrow { font-size: 1rem; opacity: 0.7; }
+      }
+    }
 
-        .arrow-icon { font-size: 1rem; opacity: 0.7; }
+    // Chips (Tags)
+    .tags-row {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px;
+      .tag-chip {
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 6px;
+        border: 1px solid;
+        white-space: nowrap;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
       }
     }
   }
 
-  // 3. MONTO (Derecha)
-  .tx-amount {
-    font-family: 'Lato', sans-serif;
-    font-weight: 700;
+  // 3. MONTO (Estilo Refinado / No Abultado)
+  .txn-amount {
+    text-align: right;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 500; // Peso medio elegante
     font-size: 1rem;
     white-space: nowrap;
-    margin-left: 1rem;
+    letter-spacing: -0.7px; // Números compactos
 
-    &.GASTO { color: var(--color-text-heading); }
-    &.INGRESO { color: var(--color-success); }
-    &.TRANSFERENCIA { color: var(--color-sidebar-text); }
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+
+    .text-success {
+      color: var(--color-primary);
+      text-shadow: 0 0 10px rgba(44, 95, 83, 0.2);
+    }
+
+    .text-danger {
+      color: var(--color-text-heading);
+    }
   }
 
-  // 4. ACCIONES (Editar/Borrar)
-  .tx-actions {
+  // 4. ACCIONES (Minimalistas y Ubicadas)
+  .txn-actions {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    // Centrado vertical, empieza desplazado 10px a la derecha para animación
+    transform: translateY(-50%) translateX(10px);
+
     display: flex;
     gap: 0.5rem;
-    margin-left: 1rem;
 
-    // Ocultos por defecto
-    opacity: 0;
+    // 🔥 SIN FONDO NI SOMBRAS: Flotan limpiamente
+    background: transparent;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+
+    opacity: 0; // Invisible por defecto
     pointer-events: none;
-    transform: translateX(10px);
-    transition: all 0.2s ease-out;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 
     .icon-btn {
-      background: transparent;
-      border: none;
-      width: 32px;
-      height: 32px;
+      width: 34px; height: 34px;
       border-radius: 50%;
+      border: 1px solid transparent;
+      background: transparent; // Botón transparente
+      color: var(--color-gray-500);
+
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      color: var(--color-sidebar-text);
-      transition: all 0.2s;
+      cursor: pointer; transition: all 0.2s ease;
 
-      span { font-size: 1.2rem; }
+      span { font-size: 1.2rem; line-height: 1; }
 
+      // Hover en Botón
       &:hover {
-        background-color: rgba(0,0,0,0.05);
         color: var(--color-text-heading);
+        background: var(--color-bg-main); // Fondo suave solo al tocar el botón
+        border-color: var(--color-border);
         transform: scale(1.1);
+        box-shadow: var(--shadow-subtle);
       }
 
       &.delete:hover {
-        background-color: rgba(239, 68, 68, 0.1);
         color: var(--color-danger);
+        background: rgba(211, 47, 47, 0.1);
+        border-color: rgba(211, 47, 47, 0.2);
       }
     }
   }
 }
 
-// ESTADOS (Loading / Empty)
-.loading-state, .empty-state {
-  text-align: center;
-  padding: 4rem;
-  color: var(--color-sidebar-text);
-
-  .icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; display: block; }
-  .spinner {
-    width: 24px; height: 24px;
-    border: 3px solid var(--color-border);
-    border-top-color: var(--color-primary);
-    border-radius: 50%;
-    animation: spin 1s infinite linear;
-    margin: 0 auto 1rem auto;
+// Mobile Adjustments
+@media (max-width: 768px) {
+  .txn-item {
+    flex-wrap: wrap;
+    // Quitamos la reserva lateral en móvil, ya que los botones bajan
+    padding-right: 1rem;
+    padding-bottom: 3.5rem; // Espacio abajo para botones
   }
+
+  .txn-actions {
+    position: absolute;
+    top: auto;
+    bottom: 0.8rem;
+    right: 1rem;
+    transform: none !important; // Sin transformaciones
+    opacity: 1 !important; // Siempre visibles
+    pointer-events: auto;
+
+    // Aseguramos que se vean bien
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  .txn-amount {
+    width: 100%;
+    text-align: left;
+    margin-top: 0.5rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px dashed var(--color-border);
+    padding-top: 0.8rem;
+  }
+}
+
+// Estados
+.loading-state, .empty-state {
+  display: flex; flex-direction: column; align-items: center; padding: 4rem; color: var(--color-gray-500);
+  .spinner { width: 30px; height: 30px; border: 2px solid var(--color-border); border-top-color: var(--color-primary); border-radius: 50%; animation: spin 0.8s infinite linear; margin-bottom: 1rem; }
+  .icon { font-size: 3rem; margin-bottom: 0.5rem; opacity: 0.3; }
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-// MEDIA QUERY (Móvil)
-@media (max-width: 768px) {
-  .transaction-item {
-    // En móvil, los botones de acción siempre visibles pero más sutiles
-    .tx-actions {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateX(0);
-
-      .icon-btn {
-        width: 28px; height: 28px; // Un poco más pequeños para que quepan
-        opacity: 0.7;
-      }
-    }
-
-    // Ajuste de texto para pantallas pequeñas
-    .tx-meta {
-      font-size: 0.7rem;
-      .account-name { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    }
-  }
-}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

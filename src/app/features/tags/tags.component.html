@@ -1,0 +1,81 @@
+<div class="tags-sub-page">
+
+  <div class="page-toolbar">
+    <div class="toolbar-spacer"></div>
+
+    <button class="btn-primary" (click)="openCreate()">
+      <span class="material-symbols-rounded">add</span>
+      Nueva
+    </button>
+  </div>
+
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+  </div>
+
+  <div *ngIf="!isLoading() && tags().length === 0" class="empty-state">
+    <span class="material-symbols-rounded icon">label_off</span>
+    <p>Sin etiquetas. Crea una para organizar tus gastos.</p>
+  </div>
+
+  <div *ngIf="!isLoading() && tags().length > 0" class="tags-grid">
+
+    <div *ngFor="let tag of tags()" class="tag-card">
+      <div class="color-strip" [style.background-color]="tag.color"></div>
+
+      <div class="tag-content">
+        <div class="tag-header">
+          <div class="tag-preview" [style.background-color]="tag.color + '20'" [style.color]="tag.color">
+            <span class="material-symbols-rounded icon">label</span>
+          </div>
+
+          <div class="tag-info">
+            <span class="name">{{ tag.name }}</span>
+            <span class="hex">{{ tag.color }}</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-icon" (click)="deleteTag(tag.id)">
+        <span class="material-symbols-rounded">delete</span>
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<app-modal [isOpen]="isModalOpen()" title="Nueva Etiqueta" (close)="closeModal()">
+  <form [formGroup]="tagForm" (ngSubmit)="onSubmit()" class="modal-form">
+
+    <div class="form-group">
+      <label>Nombre</label>
+      <input type="text" formControlName="name" class="form-input" placeholder="Ej: Viaje2024">
+    </div>
+
+    <div class="form-group">
+      <label>Color distintivo</label>
+
+      <div class="color-palette-grid">
+        <div *ngFor="let color of PRESET_COLORS"
+             class="color-option"
+             [style.background-color]="color"
+             [class.selected]="isColorSelected(color)"
+             (click)="selectColor(color)">
+
+          <span *ngIf="isColorSelected(color)" class="material-symbols-rounded check-icon">
+            check
+          </span>
+        </div>
+      </div>
+      <input type="hidden" formControlName="color">
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="closeModal()">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="tagForm.invalid || isSubmitting()">
+        {{ isSubmitting() ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

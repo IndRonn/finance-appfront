@@ -16,10 +16,13 @@ export interface Transaction {
   accountName: string;
   categoryId?: number;
   categoryName?: string;
-  destinationAccountId?: number; // Solo transferencias
+  destinationAccountId?: number;
   destinationAccountName?: string;
   exchangeRate?: number;
   tags: Tag[];
+
+  // CORRECCIÓN: Agregamos esto para que el HTML no falle
+  currency?: string;
 }
 
 export interface CreateTransactionRequest {

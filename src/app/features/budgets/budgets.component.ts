@@ -15,6 +15,8 @@ import { TransactionType } from '@core/models/enums.model';
 import { BudgetProgressComponent } from './components/budget-progress/budget-progress.component';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { AutoFocusDirective } from '@shared/directives/auto-focus.directive';
+import {UiStateService} from "@core/services/ui-state.service";
+
 
 @Component({
   selector: 'app-budgets',
@@ -29,6 +31,7 @@ export class BudgetsComponent implements OnInit {
   private accountService = inject(AccountService); // <--- Inyectar
   private fb = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
+  private uiState = inject(UiStateService);
 
   budgets = signal<BudgetResponse[]>([]);
   categories = signal<CategoryResponse[]>([]);
@@ -45,6 +48,7 @@ export class BudgetsComponent implements OnInit {
   });
 
   ngOnInit() {
+    this.uiState.setPageTitle('Presupuestos', 'Control de Límites');
     this.loadBudgets();
     this.loadCategories();
     this.setupAutoRefresh(); // <--- Activar escucha

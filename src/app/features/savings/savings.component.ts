@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'; // <--- Importante
 import { SavingsGoalService } from './services/savings-goal.service';
 import { SavingsGoalResponse, SavingsGoalRequest } from '@core/models/savings-goal.model';
-import { ModalComponent } from '@shared/components/modal/modal.component'; // <--- Reutilizamos
+import { ModalComponent } from '@shared/components/modal/modal.component';
+import {UiStateService} from "@core/services/ui-state.service"; // <--- Reutilizamos
 
 @Component({
   selector: 'app-savings',
@@ -15,6 +16,7 @@ import { ModalComponent } from '@shared/components/modal/modal.component'; // <-
 export class SavingsComponent implements OnInit {
   private savingsService = inject(SavingsGoalService);
   private fb = inject(FormBuilder);
+  private uiState = inject(UiStateService);
 
   goals = signal<SavingsGoalResponse[]>([]);
   isLoading = signal(true);
@@ -33,6 +35,7 @@ export class SavingsComponent implements OnInit {
 
   ngOnInit() {
     this.loadGoals();
+    this.uiState.setPageTitle('Bóvedas', 'Metas de Ahorro');
   }
 
   loadGoals() {

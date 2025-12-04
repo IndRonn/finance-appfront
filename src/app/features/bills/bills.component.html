@@ -1,4 +1,5 @@
 <div class="bills-page">
+
   <header class="page-header">
     <div class="title-group">
       <h1>Recibos de Servicios</h1>
@@ -18,8 +19,7 @@
       *ngFor="let bill of bills()"
       [bill]="bill"
       (pay)="openPay($event)"
-      (clone)="openClone($event)"
-      (edit)="openEdit($event)"
+      (clone)="openClone($event)" (edit)="openEdit($event)"
       (delete)="deleteBill($event)">
     </app-bill-card>
 
@@ -30,7 +30,9 @@
   </div>
 </div>
 
-<app-modal [isOpen]="isFormModalOpen()" [title]="editingId() ? 'Editar Recibo' : 'Registrar Recibo'" (close)="isFormModalOpen.set(false)">
+<app-modal
+  [isOpen]="isFormModalOpen()"
+  [title]="formModalTitle" (close)="isFormModalOpen.set(false)">
   <form [formGroup]="billForm" (ngSubmit)="onSubmitBill()" class="modal-form">
 
     <div class="form-group">
@@ -61,7 +63,7 @@
       <div class="form-group">
         <label>Monto</label>
         <div class="input-group">
-          <input type="number" formControlName="amount" class="form-input">
+          <input type="number" formControlName="amount" class="form-input" placeholder="0.00">
         </div>
       </div>
       <div class="form-group">
@@ -72,7 +74,9 @@
 
     <div class="form-actions">
       <button type="button" class="btn-cancel" (click)="isFormModalOpen.set(false)">Cancelar</button>
-      <button type="submit" class="btn-primary" [disabled]="billForm.invalid || isSubmitting()">Guardar</button>
+      <button type="submit" class="btn-primary" [disabled]="billForm.invalid || isSubmitting()">
+        {{ isSubmitting() ? 'Guardando...' : (editingId() ? 'Actualizar' : 'Guardar') }}
+      </button>
     </div>
   </form>
 </app-modal>

@@ -1,13 +1,18 @@
 import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'; // <--- Importante
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // Services & Models
 import { TransactionService } from './services/transaction.service';
-import { AccountService } from '@features/accounts/services/account.service'; // <--- Importar
-import { ModalStateService } from '@core/services/modal-state.service'; // <--- Para editar
+import { AccountService } from '@features/accounts/services/account.service';
+import { ModalStateService } from '@core/services/modal-state.service';
 import { Transaction } from '@core/models/transaction.model';
 import { TransactionType } from '@core/models/enums.model';
+import { UiStateService } from "@core/services/ui-state.service";
+
+// Components & Pipes
+import { QuickTransactionModalComponent } from '@shared/components/quick-transaction-modal/quick-transaction-modal.component';
+import { SlytherinCurrencyPipe } from '@shared/pipes/slytherin-currency.pipe';
 
 interface DailyGroup {
   date: string;
@@ -19,52 +24,74 @@ interface DailyGroup {
 @Component({
   selector: 'app-transactions',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    QuickTransactionModalComponent,
+    SlytherinCurrencyPipe
+  ],
   templateUrl: './transactions.component.html',
   styleUrls: ['./transactions.component.scss']
 })
 export class TransactionsComponent implements OnInit {
   private transactionService = inject(TransactionService);
-  private accountService = inject(AccountService); // <--- Inyectar
-  private modalState = inject(ModalStateService);  // <--- Inyectar
+  private accountService = inject(AccountService);
+  private modalState = inject(ModalStateService);
   private destroyRef = inject(DestroyRef);
+  private uiState = inject(UiStateService);
 
+  // Signals
   isLoading = signal(true);
   groupedTransactions = signal<DailyGroup[]>([]);
+  isModalOpen = signal(false);
+
   TransactionType = TransactionType;
 
   ngOnInit() {
+    this.uiState.setPageTitle('Movimientos');
     this.loadHistory();
-    this.setupAutoRefresh(); // <--- Activar escucha
+    this.setupAutoRefresh();
   }
 
-  // --- TIEMPO REAL ---
   private setupAutoRefresh() {
     this.accountService.refreshNeeded$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        // Si se crea un movimiento desde el Header, actualizamos la lista
         this.loadHistory();
       });
   }
 
   loadHistory() {
-    // Si es refresh automático, podrías evitar el spinner si quisieras
-    // this.isLoading.set(true);
+    if (this.groupedTransactions().length === 0) this.isLoading.set(true);
+
+    // CORRECCIÓN 1: Usar .getHistory() en lugar de .getAll()
     this.transactionService.getHistory().subscribe({
-      next: (data) => {
+
+      // CORRECCIÓN 2: Tipar explícitamente 'data' como Transaction[]
+      next: (data: Transaction[]) => {
         const groups = this.groupByDate(data);
         this.groupedTransactions.set(groups);
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error(err);
+
+      // CORRECCIÓN 3: Tipar 'err' como any
+      error: (err: any) => {
+        console.error('Error cargando historial:', err);
         this.isLoading.set(false);
       }
     });
   }
 
-  // --- ACCIONES CRUD ---
+  // ... (El resto del código: getIcon, editTransaction, deleteTransaction, groupByDate... se mantiene igual)
+
+  getIcon(trx: Transaction): string {
+    if (trx.type === TransactionType.INGRESO) return 'arrow_upward';
+    if (trx.type === TransactionType.GASTO) return 'arrow_downward';
+    return 'sync_alt';
+  }
+
+  openNewTransaction() {
+    this.isModalOpen.set(true);
+  }
 
   editTransaction(tx: Transaction) {
     this.modalState.openEditTransaction(tx);
@@ -74,18 +101,28 @@ export class TransactionsComponent implements OnInit {
     if(!confirm('¿Eliminar este movimiento? El saldo será restaurado.')) return;
 
     this.transactionService.deleteTransaction(id).subscribe({
-      // No necesitamos llamar a loadHistory() aquí porque el servicio ya hace
-      // tap(() => notifyRefresh()), lo que dispara el setupAutoRefresh() de arriba.
-      error: (e) => console.error(e)
+      next: () => {
+        this.loadHistory();
+      },
+      error: (e: any) => console.error(e)
     });
   }
 
-  // --- HELPERS DE AGRUPACIÓN (Igual que antes) ---
+  closeModal() {
+    this.isModalOpen.set(false);
+  }
+
+  onTransactionSaved() {
+    this.closeModal();
+    this.loadHistory();
+  }
+
   private groupByDate(transactions: Transaction[]): DailyGroup[] {
     const groups: { [key: string]: DailyGroup } = {};
 
     transactions.forEach(tx => {
-      const dateKey = tx.transactionDate.substring(0, 10);
+      const dateKey = new Date(tx.transactionDate).toISOString().split('T')[0];
+
       if (!groups[dateKey]) {
         groups[dateKey] = {
           date: dateKey,
@@ -94,7 +131,9 @@ export class TransactionsComponent implements OnInit {
           dailyTotal: 0
         };
       }
+
       groups[dateKey].transactions.push(tx);
+
       if (tx.type === TransactionType.GASTO) groups[dateKey].dailyTotal -= tx.amount;
       if (tx.type === TransactionType.INGRESO) groups[dateKey].dailyTotal += tx.amount;
     });
@@ -112,7 +151,6 @@ export class TransactionsComponent implements OnInit {
     const yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
 
-    // Ajuste de zona horaria simple para comparar fechas locales
     const dStr = date.toISOString().split('T')[0];
     const tStr = today.toISOString().split('T')[0];
     const yStr = yesterday.toISOString().split('T')[0];
@@ -120,9 +158,7 @@ export class TransactionsComponent implements OnInit {
     if (dStr === tStr) return 'Hoy';
     if (dStr === yStr) return 'Ayer';
 
-    // Como date viene de "YYYY-MM-DD" y new Date() asume UTC a veces,
-    // usamos la fecha con la parte de tiempo T00:00 para formatear seguro
-    const localDate = new Date(dStr + 'T00:00:00');
+    const localDate = new Date(dStr + 'T12:00:00');
     return localDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' });
   }
 }

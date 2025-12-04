@@ -1,15 +1,11 @@
 <div class="debts-page">
 
-  <header class="page-header">
-    <div class="title-group">
-      <h1>Pasivos Externos</h1>
-      <p class="subtitle">Controla tus deudas y recupera tu libertad.</p>
-    </div>
+  <div class="page-toolbar">
     <button class="btn-primary" (click)="openCreate()">
       <span class="material-symbols-rounded">add</span>
       Nueva Deuda
     </button>
-  </header>
+  </div>
 
   <div *ngIf="isLoading()" class="loading-state">
     <div class="spinner"></div>

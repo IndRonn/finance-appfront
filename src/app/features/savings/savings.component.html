@@ -1,15 +1,11 @@
 <div class="savings-page">
 
-  <header class="page-header">
-    <div class="title-group">
-      <h1>Bóvedas</h1>
-      <p class="subtitle">Tus objetivos patrimoniales.</p>
-    </div>
+  <div class="page-toolbar">
     <button class="btn-primary" (click)="openCreateModal()">
       <span class="material-symbols-rounded">add</span>
       Nueva Meta
     </button>
-  </header>
+  </div>
 
   <div *ngIf="isLoading()" class="loading-state">
     <div class="spinner"></div>

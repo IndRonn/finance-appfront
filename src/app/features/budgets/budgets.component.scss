@@ -3,21 +3,17 @@
   margin: 0 auto;
 }
 
-.page-header {
+.page-toolbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; // Separados
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+  margin-bottom: 1.5rem;
+  padding-top: 0.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 
-  .header-content {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-
-    h1 { margin: 0; font-size: 1.5rem; line-height: 1; }
-  }
+  // Estilos del botón primario (copiados de accounts o globales)
+  .btn-primary { /* ... */ }
 }
 
 // Navegador de Meses

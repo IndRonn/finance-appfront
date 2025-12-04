@@ -1,70 +1,87 @@
-<div class="history-page">
+<div class="transactions-page">
 
-  <header class="page-header">
-    <div class="title-group">
-      <h1>Movimientos</h1>
-      <p class="subtitle">Historial detallado de operaciones.</p>
-    </div>
-  </header>
+  <div class="page-toolbar">
+    <div class="toolbar-spacer"></div>
+    <button class="btn-primary" (click)="openNewTransaction()">
+      <span class="material-symbols-rounded">add</span>
+      Nuevo Movimiento
+    </button>
+  </div>
 
   <div *ngIf="isLoading()" class="loading-state">
     <div class="spinner"></div>
-    <p>Recuperando archivos...</p>
+    <p>Recuperando historial...</p>
   </div>
 
   <div *ngIf="!isLoading() && groupedTransactions().length === 0" class="empty-state">
     <span class="material-symbols-rounded icon">receipt_long</span>
-    <p>Aún no hay movimientos registrados.</p>
+    <h3>Sin Movimientos</h3>
+    <p>Registra tus ingresos y gastos para ver el historial aquí.</p>
   </div>
 
-  <div *ngIf="!isLoading()" class="transactions-list">
+  <div *ngIf="!isLoading() && groupedTransactions().length > 0" class="transactions-list">
 
     <div *ngFor="let group of groupedTransactions()" class="day-group">
 
       <div class="day-header">
         <span class="date-label">{{ group.date }}</span>
-        <span class="day-total" [class.positive]="group.dailyTotal > 0">
-          {{ group.dailyTotal | currency:'PEN':'symbol':'1.2-2' }}
+        <span class="day-total"
+              [class.text-success]="group.dailyTotal > 0"
+              [class.text-danger]="group.dailyTotal < 0">
+          {{ group.dailyTotal | currency:'PEN':'symbol':'1.0-0' }}
         </span>
       </div>
 
       <div class="transactions-card">
 
-        <div *ngFor="let tx of group.transactions" class="transaction-item">
+        <div *ngFor="let tx of group.transactions" class="txn-item">
 
-          <div class="tx-icon" [ngClass]="tx.type">
-            <span class="material-symbols-rounded">
-              {{ tx.type === 'INGRESO' ? 'arrow_downward' : (tx.type === 'GASTO' ? 'arrow_upward' : 'sync_alt') }}
-            </span>
+          <div class="txn-icon" [ngClass]="tx.type">
+            <span class="material-symbols-rounded">{{ getIcon(tx) }}</span>
           </div>
 
-          <div class="tx-details">
-            <span class="tx-desc">{{ tx.description }}</span>
+          <div class="txn-details">
 
-            <div class="tx-meta">
+            <div class="description-row">
+              <span class="desc">{{ tx.description }}</span>
+            </div>
+
+            <div class="meta-row">
               <ng-container *ngIf="tx.type === TransactionType.TRANSFERENCIA; else standardMeta">
                 <span class="transfer-flow">
                   {{ tx.accountName }}
-                  <span class="material-symbols-rounded arrow-icon">arrow_right_alt</span>
+                  <span class="material-symbols-rounded arrow">arrow_right_alt</span>
                   {{ tx.destinationAccountName || 'Destino' }}
                 </span>
               </ng-container>
 
               <ng-template #standardMeta>
-                <span class="category">{{ tx.categoryName || 'Sin Categoría' }}</span>
-                <span class="dot">•</span>
-                <span class="account-name">{{ tx.accountName }}</span>
+                <span class="meta-pill account">{{ tx.accountName }}</span>
+                <span class="meta-pill category" *ngIf="tx.categoryName">{{ tx.categoryName }}</span>
               </ng-template>
+            </div>
+
+            <div class="tags-row" *ngIf="tx.tags && tx.tags.length > 0">
+              <span *ngFor="let tag of tx.tags"
+                    class="tag-chip"
+                    [style.background-color]="tag.color + '20'"
+                    [style.color]="tag.color"
+                    [style.border-color]="tag.color">
+                {{ tag.name }}
+              </span>
             </div>
           </div>
 
-          <div class="tx-amount" [ngClass]="tx.type">
-            <span class="symbol">{{ tx.type === 'GASTO' ? '-' : '+' }}</span>
-            {{ tx.amount | currency:'PEN':'symbol':'1.2-2' }}
+          <div class="txn-amount">
+            <span [class.text-danger]="tx.type === 'GASTO'"
+                  [class.text-success]="tx.type === 'INGRESO'">
+              {{ tx.type === 'GASTO' ? '-' : (tx.type === 'INGRESO' ? '+' : '') }}
+              {{ tx.amount | currency: (tx.currency || 'PEN') }}
+            </span>
           </div>
 
-          <div class="tx-actions">
-            <button class="icon-btn edit" (click)="editTransaction(tx)" title="Editar">
+          <div class="txn-actions">
+            <button class="icon-btn" (click)="editTransaction(tx)" title="Editar">
               <span class="material-symbols-rounded">edit</span>
             </button>
             <button class="icon-btn delete" (click)="deleteTransaction(tx.id)" title="Eliminar">
@@ -72,10 +89,11 @@
             </button>
           </div>
 
-        </div>
-      </div>
-
-    </div>
-
-  </div>
+        </div> </div> </div> </div>
 </div>
+
+<app-quick-transaction-modal
+  [isOpen]="isModalOpen()"
+  (close)="closeModal()"
+  (saved)="onTransactionSaved()">
+</app-quick-transaction-modal>

@@ -5,6 +5,7 @@ import { CategoryService } from './services/category.service';
 import { CategoryResponse, CategoryRequest, CategoryManagementType } from '@core/models/category.model';
 import { TransactionType } from '@core/models/enums.model';
 import { ModalComponent } from '@shared/components/modal/modal.component';
+import {UiStateService} from "@core/services/ui-state.service";
 
 @Component({
   selector: 'app-categories',
@@ -16,6 +17,7 @@ import { ModalComponent } from '@shared/components/modal/modal.component';
 export class CategoriesComponent implements OnInit {
   private categoryService = inject(CategoryService);
   private fb = inject(FormBuilder);
+
 
   categories = signal<CategoryResponse[]>([]);
   isLoading = signal(true);
